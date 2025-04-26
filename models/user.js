@@ -1,0 +1,89 @@
+'use strict';
+const { Model } = require('sequelize');
+module.exports = (sequelize, Sequelize) => {
+  class User extends Model {
+    static associate() {
+      // define association here
+    }
+  }
+  User.init(
+    {
+      firstName: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: null,
+      },
+      lastName: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: null,
+      },
+      roleId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Roles',
+          key: 'id',
+        },
+        allowNull: false,
+        onDelete: 'Cascade',
+      },
+      companyName: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: null,
+      },
+      email: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      verifiedAt: {
+        allowNull: true,
+        type: Sequelize.DATE,
+        defaultValue: null,
+      },
+      verifyCode: {
+        allowNull: true,
+        type: Sequelize.STRING,
+        defaultValue: null,
+      },
+      deactivatedAt: {
+        allowNull: true,
+        type: Sequelize.DATE,
+        defaultValue: null,
+      },
+      deletedAt: {
+        allowNull: true,
+        type: Sequelize.DATE,
+        defaultValue: null,
+      },
+      isActive: {
+        allowNull: true,
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
+      facebookId: {
+        allowNull: true,
+        type: Sequelize.STRING,
+        defaultValue: null,
+      },
+      googleId: {
+        allowNull: true,
+        type: Sequelize.STRING,
+        defaultValue: null,
+      },
+      appleId: {
+        allowNull: true,
+        type: Sequelize.STRING,
+        defaultValue: null,
+      },
+    },
+    {
+      sequelize,
+      modelName: 'User',
+      paranoid: true,
+      deletedAt: 'deletedAt',
+      timestamps: true,
+    },
+  );
+  return User;
+};

@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node bin/www.js",
     "watch": "nodemon bin/www.js",
-    "db:model:generate": "npx sequelize-cli model:generate --name User --attributes firstName:string,lastName:string,email:string",
+    "db:model:generate": "npx sequelize-cli model:generate --name User --attributes firstName:STRING,lastName:STRING,email:STRING",
     "db:migrate": "npx sequelize-cli db:migrate",
     "db:undo:last:migration": "npx sequelize-cli db:migrate:undo",
     "db:undo:all": "npx sequelize-cli db:migrate:undo:all",
