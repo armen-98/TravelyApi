@@ -1,0 +1,19 @@
+{
+  "not_found_user": "Gebruiker niet gevonden",
+  "user_deactivated": "Gebruiker is gedeactiveerd",
+  "internal_error": "Interne serverfout",
+  "access_denied": "Toegang geweigerd",
+  "failed_token": "Authenticatie van token mislukt",
+  "no_token": "Geen token opgegeven",
+  "invalid_email": "Ongeldig e-mailformaat",
+  "invalid_username": "Ongeldige gebruikersnaam",
+  "exist_email": "E-mailadres bestaat al",
+  "exist_username": "Gebruikersnaam bestaat al",
+  "register_success": "Gebruiker succesvol geregistreerd",
+  "invalid_password": "Ongeldig wachtwoord",
+  "login_success": "Inloggen succesvol",
+  "username_invalid_length": "Gebruikersnaam moet tussen 3 en 20 tekens lang zijn",
+  "username_invalid_format": "Gebruikersnaam mag alleen letters, cijfers, punt en onderstrepingsteken bevatten",
+  "invalid_role": "ongeldige rol",
+  "user_not_created": "Gebruiker niet aangemaakt"
+}

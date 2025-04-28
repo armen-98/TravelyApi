@@ -1,0 +1,19 @@
+{
+  "not_found_user": "Utilisateur introuvable",
+  "user_deactivated": "L'utilisateur est désactivé",
+  "internal_error": "Erreur interne du serveur",
+  "access_denied": "Accès refusé",
+  "failed_token": "Échec de l'authentification du jeton",
+  "no_token": "Aucun jeton fourni",
+  "invalid_email": "Format d'e-mail non valide",
+  "invalid_username": "Nom d'utilisateur non valide",
+  "exist_email": "L'e-mail existe déjà",
+  "exist_username": "Le nom d'utilisateur existe déjà",
+  "register_success": "Utilisateur enregistré avec succès",
+  "invalid_password": "Mot de passe non valide",
+  "login_success": "Connexion réussie",
+  "username_invalid_length": "Le nom d'utilisateur doit comporter entre 3 et 20 caractères",
+  "username_invalid_format": "Le nom d'utilisateur ne peut contenir que des lettres, des chiffres, un point et un trait de soulignement",
+  "invalid_role": "rôle invalide",
+  "user_not_created": "Utilisateur non créé"
+}

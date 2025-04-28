@@ -1,0 +1,19 @@
+{
+  "not_found_user": "사용자를 찾을 수 없습니다",
+  "user_deactivated": "사용자가 비활성화되었습니다",
+  "internal_error": "내부 서버 오류",
+  "access_denied": "액세스가 거부되었습니다",
+  "failed_token": "토큰 인증 실패",
+  "no_token": "토큰이 제공되지 않았습니다",
+  "invalid_email": "유효하지 않은 이메일 형식",
+  "invalid_username": "유효하지 않은 사용자 이름",
+  "exist_email": "이미 존재하는 이메일입니다",
+  "exist_username": "이미 존재하는 사용자 이름입니다",
+  "register_success": "사용자 등록 성공",
+  "invalid_password": "유효하지 않은 비밀번호",
+  "login_success": "로그인 성공",
+  "username_invalid_length": "사용자 이름은 3~20자 사이여야 합니다",
+  "username_invalid_format": "사용자 이름은 문자, 숫자, 점, 밑줄만 포함할 수 있습니다",
+  "invalid_role": "유효하지 않은 역할",
+  "user_not_created": "사용자가 생성되지 않았습니다"
+}

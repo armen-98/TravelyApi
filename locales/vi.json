@@ -1,0 +1,19 @@
+{
+  "not_found_user": "Không tìm thấy người dùng",
+  "user_deactivated": "Người dùng đã bị vô hiệu hóa",
+  "internal_error": "Lỗi máy chủ nội bộ",
+  "access_denied": "Truy cập bị từ chối",
+  "failed_token": "Xác thực mã thông báo thất bại",
+  "no_token": "Không có mã thông báo nào được cung cấp",
+  "invalid_email": "Định dạng email không hợp lệ",
+  "invalid_username": "Tên người dùng không hợp lệ",
+  "exist_email": "Email đã tồn tại",
+  "exist_username": "Tên người dùng đã tồn tại",
+  "register_success": "Đăng ký người dùng thành công",
+  "invalid_password": "Mật khẩu không hợp lệ",
+  "login_success": "Đăng nhập thành công",
+  "username_invalid_length": "Tên người dùng phải từ 3 đến 20 ký tự",
+  "username_invalid_format": "Tên người dùng chỉ có thể chứa chữ cái, số, dấu chấm và dấu gạch dưới",
+  "invalid_role": "vai trò không hợp lệ",
+  "user_not_created": "Người dùng chưa được tạo"
+}

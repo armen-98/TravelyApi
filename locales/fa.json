@@ -1,0 +1,19 @@
+{
+  "not_found_user": "کاربر یافت نشد",
+  "user_deactivated": "کاربر غیرفعال شده است",
+  "internal_error": "خطای داخلی سرور",
+  "access_denied": "دسترسی رد شد",
+  "failed_token": "تایید اعتبار توکن ناموفق بود",
+  "no_token": "توکن ارائه نشده است",
+  "invalid_email": "فرمت ایمیل نامعتبر است",
+  "invalid_username": "نام کاربری نامعتبر است",
+  "exist_email": "ایمیل از قبل وجود دارد",
+  "exist_username": "نام کاربری از قبل وجود دارد",
+  "register_success": "کاربر با موفقیت ثبت نام شد",
+  "invalid_password": "رمز عبور نامعتبر است",
+  "login_success": "ورود با موفقیت انجام شد",
+  "username_invalid_length": "نام کاربری باید بین 3 تا 20 کاراکتر باشد",
+  "username_invalid_format": "نام کاربری فقط می تواند شامل حروف، اعداد، نقطه و زیرخط باشد",
+  "invalid_role": "نقش نامعتبر",
+  "user_not_created": "کاربر ایجاد نشد"
+}

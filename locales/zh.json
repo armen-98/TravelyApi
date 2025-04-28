@@ -1,0 +1,19 @@
+{
+  "not_found_user": "找不到用户",
+  "user_deactivated": "用户已被停用",
+  "internal_error": "内部服务器错误",
+  "access_denied": "拒绝访问",
+  "failed_token": "令牌验证失败",
+  "no_token": "未提供令牌",
+  "invalid_email": "无效的电子邮件格式",
+  "invalid_username": "无效的用户名",
+  "exist_email": "该电子邮件已存在",
+  "exist_username": "该用户名已存在",
+  "register_success": "用户注册成功",
+  "invalid_password": "无效的密码",
+  "login_success": "登录成功",
+  "username_invalid_length": "用户名长度必须在 3 到 20 个字符之间",
+  "username_invalid_format": "用户名只能包含字母、数字、点和下划线",
+  "invalid_role": "无效的角色",
+  "user_not_created": "用户未创建"
+}

@@ -1,0 +1,19 @@
+{
+  "not_found_user": "Usuário não encontrado",
+  "user_deactivated": "Usuário desativado",
+  "internal_error": "Erro interno do servidor",
+  "access_denied": "Acesso negado",
+  "failed_token": "Falha ao autenticar o token",
+  "no_token": "Nenhum token fornecido",
+  "invalid_email": "Formato de e-mail inválido",
+  "invalid_username": "Nome de usuário inválido",
+  "exist_email": "O e-mail já existe",
+  "exist_username": "O nome de usuário já existe",
+  "register_success": "Usuário registrado com sucesso",
+  "invalid_password": "Senha inválida",
+  "login_success": "Login bem-sucedido",
+  "username_invalid_length": "O nome de usuário deve ter entre 3 e 20 caracteres",
+  "username_invalid_format": "O nome de usuário só pode conter letras, números, ponto e sublinhado",
+  "invalid_role": "função inválida",
+  "user_not_created": "Usuário não criado"
+}

@@ -1,0 +1,19 @@
+{
+  "not_found_user": "المستخدم غير موجود",
+  "user_deactivated": "تم تعطيل المستخدم",
+  "internal_error": "خطأ داخلي في الخادم",
+  "access_denied": "تم رفض الوصول",
+  "failed_token": "فشل في مصادقة الرمز",
+  "no_token": "لم يتم تقديم رمز",
+  "invalid_email": "تنسيق البريد الإلكتروني غير صالح",
+  "invalid_username": "اسم مستخدم غير صالح",
+  "exist_email": "البريد الإلكتروني موجود بالفعل",
+  "exist_username": "اسم المستخدم موجود بالفعل",
+  "register_success": "تم تسجيل المستخدم بنجاح",
+  "invalid_password": "كلمة مرور غير صالحة",
+  "login_success": "تم تسجيل الدخول بنجاح",
+  "username_invalid_length": "يجب أن يكون طول اسم المستخدم بين 3 و20 حرفًا",
+  "username_invalid_format": "يمكن لاسم المستخدم أن يحتوي فقط على حروف وأرقام ونقطة وشرطة سفلية",
+  "invalid_role": "دور غير صالح",
+  "user_not_created": "لم يتم إنشاء المستخدم"
+}

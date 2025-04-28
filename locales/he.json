@@ -1,0 +1,19 @@
+{
+  "not_found_user": "משתמש לא נמצא",
+  "user_deactivated": "המשתמש מושבת",
+  "internal_error": "שגיאת שרת פנימית",
+  "access_denied": "הגישה נדחתה",
+  "failed_token": "אימות האסימון נכשל",
+  "no_token": "לא סופק אסימון",
+  "invalid_email": "פורמט אימייל לא תקין",
+  "invalid_username": "שם משתמש לא תקין",
+  "exist_email": "כתובת האימייל כבר קיימת",
+  "exist_username": "שם המשתמש כבר קיים",
+  "register_success": "המשתמש נרשם בהצלחה",
+  "invalid_password": "סיסמה לא תקינה",
+  "login_success": "ההתחברות בוצעה בהצלחה",
+  "username_invalid_length": "שם המשתמש חייב להיות בין 3 ל-20 תווים",
+  "username_invalid_format": "שם המשתמש יכול להכיל רק אותיות, מספרים, נקודה וקו תחתון",
+  "invalid_role": "תפקיד לא תקין",
+  "user_not_created": "המשתמש לא נוצר"
+}

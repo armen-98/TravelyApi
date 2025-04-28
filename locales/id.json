@@ -1,0 +1,19 @@
+{
+  "not_found_user": "Pengguna tidak ditemukan",
+  "user_deactivated": "Pengguna dinonaktifkan",
+  "internal_error": "Kesalahan server internal",
+  "access_denied": "Akses ditolak",
+  "failed_token": "Gagal mengautentikasi token",
+  "no_token": "Tidak ada token yang diberikan",
+  "invalid_email": "Format email tidak valid",
+  "invalid_username": "Nama pengguna tidak valid",
+  "exist_email": "Email sudah ada",
+  "exist_username": "Nama pengguna sudah ada",
+  "register_success": "Pengguna berhasil terdaftar",
+  "invalid_password": "Kata sandi tidak valid",
+  "login_success": "Login berhasil",
+  "username_invalid_length": "Nama pengguna harus antara 3 dan 20 karakter",
+  "username_invalid_format": "Nama pengguna hanya boleh berisi huruf, angka, titik, dan garis bawah",
+  "invalid_role": "peran tidak valid",
+  "user_not_created": "Pengguna tidak dibuat"
+}
