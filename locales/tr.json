@@ -1,0 +1,19 @@
+{
+  "not_found_user": "Kullanıcı bulunamadı",
+  "user_deactivated": "Kullanıcı devre dışı bırakıldı",
+  "internal_error": "Dahili sunucu hatası",
+  "access_denied": "Erişim engellendi",
+  "failed_token": "Token kimlik doğrulaması başarısız oldu",
+  "no_token": "Token sağlanmadı",
+  "invalid_email": "Geçersiz e-posta biçimi",
+  "invalid_username": "Geçersiz kullanıcı adı",
+  "exist_email": "E-posta adresi zaten mevcut",
+  "exist_username": "Kullanıcı adı zaten mevcut",
+  "register_success": "Kullanıcı başarıyla kaydedildi",
+  "invalid_password": "Geçersiz parola",
+  "login_success": "Giriş başarılı",
+  "username_invalid_length": "Kullanıcı adı 3 ile 20 karakter arasında olmalıdır",
+  "username_invalid_format": "Kullanıcı adı yalnızca harf, sayı, nokta ve alt çizgi içerebilir",
+  "invalid_role": "geçersiz rol",
+  "user_not_created": "Kullanıcı oluşturulmadı"
+}

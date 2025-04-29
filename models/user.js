@@ -2,8 +2,8 @@
 const { Model } = require('sequelize');
 module.exports = (sequelize, Sequelize) => {
   class User extends Model {
-    static associate() {
-      // define association here
+    static associate({ Customer }) {
+      User.hasOne(Customer, { foreignKey: 'userId', as: 'customer' });
     }
   }
   User.init(
@@ -31,6 +31,14 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         allowNull: true,
         defaultValue: null,
+      },
+      username: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      password: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       email: {
         type: Sequelize.STRING,

@@ -33,6 +33,14 @@ module.exports = {
         allowNull: true,
         defaultValue: null,
       },
+      username: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      password: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       email: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -45,6 +53,11 @@ module.exports = {
       verifyCode: {
         allowNull: true,
         type: Sequelize.STRING,
+        defaultValue: null,
+      },
+      deletedAt: {
+        allowNull: true,
+        type: Sequelize.DATE,
         defaultValue: null,
       },
       deactivatedAt: {

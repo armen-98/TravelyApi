@@ -1,0 +1,19 @@
+{
+	"not_found_user": "User not found",
+	"user_deactivated": "User is deactivated",
+	"internal_error": "Internal server error",
+	"access_denied": "Access denied",
+	"failed_token": "Failed to authenticate token",
+	"no_token": "No token provided",
+	"invalid_email": "Invalid email format",
+	"invalid_username": "Invalid username",
+	"exist_email": "Email already exists",
+	"exist_username": "Username already exists",
+	"register_success": "User registered successfully",
+	"invalid_password": "Invalid password",
+	"login_success": "Login successful",
+	"username_invalid_length": "Username must be between 3 and 20 characters",
+	"username_invalid_format": "Username can only contain letters, numbers, dot, and underscore",
+	"invalid_role": "invalid role",
+	"user_not_created": "User not createdƒ"
+}

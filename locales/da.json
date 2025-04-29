@@ -1,0 +1,19 @@
+{
+  "not_found_user": "Bruger ikke fundet",
+  "user_deactivated": "Bruger er deaktiveret",
+  "internal_error": "Intern serverfejl",
+  "access_denied": "Adgang nægtet",
+  "failed_token": "Kunne ikke godkende token",
+  "no_token": "Ingen token angivet",
+  "invalid_email": "Ugyldigt e-mail-format",
+  "invalid_username": "Ugyldigt brugernavn",
+  "exist_email": "E-mail eksisterer allerede",
+  "exist_username": "Brugernavn eksisterer allerede",
+  "register_success": "Bruger registreret med succes",
+  "invalid_password": "Ugyldig adgangskode",
+  "login_success": "Login succesfuld",
+  "username_invalid_length": "Brugernavn skal være mellem 3 og 20 tegn",
+  "username_invalid_format": "Brugernavn må kun indeholde bogstaver, tal, punktum og underscore",
+  "invalid_role": "Ugyldig rolle",
+  "user_not_created": "Bruger blev ikke oprettet"
+}

@@ -1,0 +1,19 @@
+{
+  "not_found_user": "ユーザーが見つかりません",
+  "user_deactivated": "ユーザーは無効化されています",
+  "internal_error": "内部サーバーエラー",
+  "access_denied": "アクセスが拒否されました",
+  "failed_token": "トークンの認証に失敗しました",
+  "no_token": "トークンが提供されていません",
+  "invalid_email": "無効なメール形式",
+  "invalid_username": "無効なユーザー名",
+  "exist_email": "メールアドレスは既に存在します",
+  "exist_username": "ユーザー名は既に存在します",
+  "register_success": "ユーザー登録に成功しました",
+  "invalid_password": "無効なパスワード",
+  "login_success": "ログインに成功しました",
+  "username_invalid_length": "ユーザー名は3〜20文字である必要があります",
+  "username_invalid_format": "ユーザー名には文字、数字、ドット、アンダースコアのみを含めることができます",
+  "invalid_role": "無効な役割",
+  "user_not_created": "ユーザーは作成されていません"
+}
