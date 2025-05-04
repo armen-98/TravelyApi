@@ -176,7 +176,80 @@ const signIn = async (req, res) => {
   }
 };
 
+const tokenValidate = async (req, res) => {
+  try {
+    const token = req.headers['authorization'];
+    if (!token) {
+      return res.status(403).json({ message: res.__('access_denied') });
+    }
+
+    const decoded = jwt.verify(
+      token.replace('Bearer ', ''),
+      process.env.JWT_SECRET,
+    );
+    const user = await User.findOne({
+      where: { id: decoded.id },
+      include: { model: Customer, as: 'customer' },
+    });
+    if (!user) {
+      return res.status(404).json({ message: res.__('not_found_user') });
+    }
+
+    return res.status(200).json({
+      data: {
+        user: {
+          ...user.dataValues,
+          ...user.customer.dataValues,
+        },
+      },
+      code: 'jwt_auth_valid_token',
+      message: res.__('token_validate_success'),
+    });
+  } catch (e) {
+    console.log('Catch error for tokenValidate', e);
+    if (process.env.NODE_ENV !== 'development') {
+      sendErrorEmail(e);
+    }
+    return res.status(500).json({
+      message: res.__('internal_error'),
+    });
+  }
+};
+
+const getAuthUser = async (req, res) => {
+  try {
+    const user = await User.findOne({
+      where: { id: req.user.id },
+      include: { model: Customer, as: 'customer' },
+    });
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      expiresIn: '1h',
+    });
+
+    return res.status(200).json({
+      data: {
+        user: {
+          ...user.dataValues,
+          ...user.customer.dataValues,
+        },
+        token,
+      },
+      message: res.__('success_message'),
+    });
+  } catch (e) {
+    console.log('Catch error for getAuthUser', e);
+    if (process.env.NODE_ENV !== 'development') {
+      sendErrorEmail(e);
+    }
+    return res.status(500).json({
+      message: res.__('internal_error'),
+    });
+  }
+};
+
 module.exports = {
   signUp,
   signIn,
+  tokenValidate,
+  getAuthUser,
 };

@@ -13,7 +13,8 @@
 	"invalid_password": "Invalid password",
 	"login_success": "Login successful",
 	"username_invalid_length": "Username must be between 3 and 20 characters",
-	"username_invalid_format": "Username can only contain letters, numbers, dot, and underscore",
+	"username_invalid_format": "Username can only contain letters and numbers.",
 	"invalid_role": "invalid role",
-	"user_not_created": "User not createdƒ"
+	"user_not_created": "User not created",
+	"success_message": "Request success"
 }
