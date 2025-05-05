@@ -17,7 +17,7 @@ async function sendEmail({ to, subject, text, html }) {
     });
 
     const info = await transporter.sendMail({
-      from: '"WanderGid api 👻" <WanderGid>',
+      from: '"TravelGO 👻" <WanderGid>',
       to,
       subject,
       text,
@@ -34,7 +34,6 @@ async function sendEmail({ to, subject, text, html }) {
 
 const sendErrorEmail = async (error) => {
   try {
-    console.log('error', error);
     await sendEmail({
       to: ['matevosyan.2011@gmail.com', 'armann.davtyan@gmail.com'],
       subject: 'API error!',

@@ -13,7 +13,14 @@
 	"invalid_password": "Invalid password",
 	"login_success": "Login successful",
 	"username_invalid_length": "Username must be between 3 and 20 characters",
-	"username_invalid_format": "Username can only contain letters, numbers, dot, and underscore",
+	"username_invalid_format": "Username can only contain letters and numbers",
 	"invalid_role": "invalid role",
-	"user_not_created": "User not createdƒ"
+	"user_not_created": "User not created",
+	"success_message": "Request success",
+	"invalid_otp": "Invalid code, please check again",
+	"otp_not_verified": "OTP not verified",
+	"otp_sent_success": "Your OTP for password reset. This OTP will expire in 10 minutes",
+	"password_subject": "Password Reset",
+	"password_changed_success": "Password changed successfully",
+	"username_or_email_required": "Email or username is required"
 }
