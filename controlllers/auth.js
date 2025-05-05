@@ -2,6 +2,7 @@ const { sendErrorEmail } = require('../services/nodemiler');
 const jwt = require('jsonwebtoken');
 const { User, Role, Customer, sequelize } = require('../models');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const validator = require('validator');
 
 const isValidEmail = (email) => {
@@ -154,6 +155,16 @@ const signIn = async (req, res) => {
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
       expiresIn: '1h',
     });
+    // const otp = crypto.randomInt(100000, 999999).toString();
+    // await user.update({ otp });
+    // await user.reload();
+    // const sendEmail = require('../services/nodemiler').sendEmail;
+    // await sendEmail({
+    //   to: user.email,
+    //   subject: res.__('password_subject'),
+    //   text: `${otp} - ${res.__('otp_sent_success')}`,
+    // });
+
     delete user.password;
     return res.status(200).json({
       data: {
@@ -247,9 +258,171 @@ const getAuthUser = async (req, res) => {
   }
 };
 
+const forgotPassword = async (req, res) => {
+  let transaction;
+  try {
+    const { email } = req.body;
+
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ message: res.__('invalid_email') });
+    }
+
+    transaction = await sequelize.transaction({ autocommit: false });
+    const user = await User.findOne({ where: { email }, transaction });
+    if (!user) {
+      await transaction.rollback();
+      return res.status(404).json({ message: res.__('not_found_user') });
+    }
+
+    const otp = crypto.randomInt(100000, 999999).toString();
+
+    const otpExpiration = new Date();
+    otpExpiration.setMinutes(otpExpiration.getMinutes() + 10);
+
+    await User.update(
+      { otp, otpExpiration },
+      { where: { email }, transaction },
+    );
+
+    const sendEmail = require('../services/nodemiler').sendEmail;
+    await sendEmail({
+      to: email,
+      subject: res.__('password_subject'),
+      text: `${otp} - ${res.__('otp_sent_success')}`,
+    });
+    await transaction.commit();
+    return res.status(200).json({
+      message: res.__('otp_sent'),
+      data: {
+        code: otp,
+      },
+    });
+  } catch (e) {
+    console.log('Catch error for forgotPassword', e);
+    if (process.env.NODE_ENV !== 'development') {
+      sendErrorEmail(e);
+    }
+
+    if (transaction) {
+      await transaction.rollback();
+    }
+    return res.status(500).json({
+      message: res.__('internal_error'),
+    });
+  }
+};
+
+const verifyOtp = async (req, res) => {
+  let transaction;
+  try {
+    const { username, email, code } = req.body;
+
+    if (!username && !email) {
+      return res
+        .status(400)
+        .json({ message: res.__('username_or_email_required') });
+    }
+
+    transaction = await sequelize.transaction({ autocommit: false });
+
+    let user;
+    if (username) {
+      user = await User.findOne({ where: { username }, transaction });
+    } else if (email) {
+      user = await User.findOne({ where: { email }, transaction });
+    }
+
+    if (!user) {
+      await transaction.rollback();
+      return res.status(404).json({ message: res.__('not_found_user') });
+    }
+
+    if (user.otp !== code) {
+      await transaction.rollback();
+      return res.status(400).json({ message: res.__('invalid_otp') });
+    }
+
+    if (new Date() > user.otpExpiration) {
+      await transaction.rollback();
+      return res.status(400).json({ message: res.__('invalid_otp') });
+    }
+
+    await User.update(
+      { otp: null, otpExpiration: null },
+      { where: { email }, transaction },
+    );
+
+    await transaction.commit();
+    return res.status(200).json({
+      data: {},
+      message: res.__('otp_verified'),
+    });
+  } catch (e) {
+    console.log('Catch error for verifyOtp', e);
+    if (process.env.NODE_ENV !== 'development') {
+      sendErrorEmail(e);
+    }
+    if (transaction) {
+      await transaction.rollback();
+    }
+    return res.status(500).json({
+      message: res.__('internal_error'),
+    });
+  }
+};
+
+const changePassword = async (req, res) => {
+  let transaction;
+  try {
+    const { email, password } = req.body;
+
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ message: res.__('invalid_email') });
+    }
+
+    transaction = await sequelize.transaction({ autocommit: false });
+    const user = await User.findOne({ where: { email }, transaction });
+    if (!user) {
+      await transaction.rollback();
+      return res.status(404).json({ message: res.__('not_found_user') });
+    }
+
+    if (user.otp || user.otpExpiration) {
+      await transaction.rollback();
+      return res.status(400).json({ message: res.__('otp_not_verified') });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await User.update(
+      { password: hashedPassword },
+      { where: { email }, transaction },
+    );
+
+    await transaction.commit();
+    return res.status(200).json({
+      message: res.__('password_changed_success'),
+    });
+  } catch (e) {
+    console.log('Catch error for changePassword', e);
+    if (process.env.NODE_ENV !== 'development') {
+      sendErrorEmail(e);
+    }
+    if (transaction) {
+      await transaction.rollback();
+    }
+    return res.status(500).json({
+      message: res.__('internal_error'),
+    });
+  }
+};
+
 module.exports = {
   signUp,
   signIn,
   tokenValidate,
   getAuthUser,
+  forgotPassword,
+  verifyOtp,
+  changePassword,
 };

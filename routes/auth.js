@@ -8,5 +8,9 @@ router.post('/sign-up', authController.signUp);
 router.post('/sign-in', authController.signIn);
 router.post('/jwt/token/validate', authController.tokenValidate);
 router.get('/user', verifyToken, authController.getAuthUser);
+router.post('/forgot-password', authController.forgotPassword);
+router.post('/verify-otp', authController.verifyOtp);
+router.post('/resend/otp', authController.forgotPassword);
+router.post('/change-password', authController.changePassword);
 
 module.exports = router;
