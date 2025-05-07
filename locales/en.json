@@ -22,5 +22,9 @@
 	"otp_sent_success": "Your OTP for password reset. This OTP will expire in 10 minutes",
 	"password_subject": "Password Reset",
 	"password_changed_success": "Password changed successfully",
-	"username_or_email_required": "Email or username is required"
+	"username_or_email_required": "Email or username is required",
+	"token_expired": "Session expired, please sign in again",
+	"no_file": "No files were uploaded",
+	"url_invalid": "Invalid Url provided",
+	"profile_update_success": "Profile updated successfully"
 }
