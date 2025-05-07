@@ -1,5 +1,4 @@
 const { Setting } = require('../models');
-
 const getConfigs = async (req, res) => {
   try {
     const configs = await Setting.findOne();
@@ -14,7 +13,6 @@ const getConfigs = async (req, res) => {
     });
   }
 };
-
 module.exports = {
   getConfigs,
 };

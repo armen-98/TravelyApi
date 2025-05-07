@@ -2,8 +2,15 @@
 const { Model } = require('sequelize');
 module.exports = (sequelize, Sequelize) => {
   class User extends Model {
-    static associate({ Customer }) {
+    static associate({ Customer, File }) {
       User.hasOne(Customer, { foreignKey: 'userId', as: 'customer' });
+      User.hasMany(File, {
+        foreignKey: 'FileableId',
+        constraints: false,
+        scope: {
+          fileableType: ['logo', 'photo', 'favicon', 'avatar'],
+        },
+      });
     }
   }
   User.init(

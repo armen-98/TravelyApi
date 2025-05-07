@@ -103,7 +103,7 @@ const signUp = async (req, res) => {
     );
 
     const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET, {
-      expiresIn: '1h',
+      expiresIn: '7d',
     });
     delete newUser.password;
     await transaction.commit();
@@ -153,7 +153,7 @@ const signIn = async (req, res) => {
     }
 
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-      expiresIn: '1h',
+      expiresIn: '7d',
     });
     // const otp = crypto.randomInt(100000, 999999).toString();
     // await user.update({ otp });
@@ -193,11 +193,17 @@ const tokenValidate = async (req, res) => {
     if (!token) {
       return res.status(403).json({ message: res.__('access_denied') });
     }
-
-    const decoded = jwt.verify(
-      token.replace('Bearer ', ''),
-      process.env.JWT_SECRET,
-    );
+    let decoded;
+    try {
+      decoded = jwt.verify(
+        token.replace('Bearer ', ''),
+        process.env.JWT_SECRET,
+      );
+    } catch (e) {
+      if (e.message === 'jwt expired') {
+        return res.status(401).json({ message: res.__('token_expired') });
+      }
+    }
     const user = await User.findOne({
       where: { id: decoded.id },
       include: { model: Customer, as: 'customer' },
@@ -234,7 +240,7 @@ const getAuthUser = async (req, res) => {
       include: { model: Customer, as: 'customer' },
     });
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-      expiresIn: '1h',
+      expiresIn: '7d',
     });
 
     return res.status(200).json({
@@ -375,7 +381,6 @@ const changePassword = async (req, res) => {
   let transaction;
   try {
     const { email, password } = req.body;
-
     if (!isValidEmail(email)) {
       return res.status(400).json({ message: res.__('invalid_email') });
     }
