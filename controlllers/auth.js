@@ -146,6 +146,9 @@ const signIn = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: res.__('not_found_user') });
     }
+    if (user.deactivatedAt) {
+      return res.status(400).json({ message: res.__('account_deactivated') });
+    }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
@@ -422,6 +425,43 @@ const changePassword = async (req, res) => {
   }
 };
 
+const deactivateAccount = async (req, res) => {
+  let transaction;
+  try {
+    const userId = req.user.id;
+
+    transaction = await sequelize.transaction({ autocommit: false });
+
+    const user = await User.findOne({ where: { id: userId }, transaction });
+    if (!user) {
+      await transaction.rollback();
+      return res.status(404).json({ message: res.__('not_found_user') });
+    }
+
+    await User.update(
+      { isActive: false, deactivatedAt: new Date() },
+      { where: { id: userId }, transaction },
+    );
+
+    await transaction.commit();
+
+    return res.status(200).json({
+      message: res.__('account_deactivated_success'),
+    });
+  } catch (e) {
+    console.log('Catch error for deactivateAccount', e);
+    if (process.env.NODE_ENV !== 'development') {
+      sendErrorEmail(e);
+    }
+    if (transaction) {
+      await transaction.rollback();
+    }
+    return res.status(500).json({
+      message: res.__('internal_error'),
+    });
+  }
+};
+
 module.exports = {
   signUp,
   signIn,
@@ -430,4 +470,5 @@ module.exports = {
   forgotPassword,
   verifyOtp,
   changePassword,
+  deactivateAccount,
 };
