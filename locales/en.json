@@ -26,5 +26,7 @@
 	"token_expired": "Session expired, please sign in again",
 	"no_file": "No files were uploaded",
 	"url_invalid": "Invalid Url provided",
-	"profile_update_success": "Profile updated successfully"
+	"profile_update_success": "Profile updated successfully",
+	"account_deactivated_success": "Account deactivated",
+	"account_deactivated": "Account is deactivated"
 }

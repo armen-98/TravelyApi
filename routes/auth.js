@@ -12,5 +12,10 @@ router.post('/forgot-password', authController.forgotPassword);
 router.post('/verify-otp', authController.verifyOtp);
 router.post('/resend/otp', authController.forgotPassword);
 router.post('/change-password', authController.changePassword);
+router.post(
+  '/deactivate-account',
+  verifyToken,
+  authController.deactivateAccount,
+);
 
 module.exports = router;

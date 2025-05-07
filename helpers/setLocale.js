@@ -1,6 +1,13 @@
+const { Setting } = require('../models');
 const languageMiddleware = async (req, res, next) => {
   try {
-    const languageFromDb = 'hy';
+    const settings = await Setting.findOne({
+      where: {
+        deviceId: req.headers.deviceid,
+      },
+      attributes: ['language', 'deviceId'],
+    });
+    const languageFromDb = settings?.language || 'en';
     if (languageFromDb) {
       req.setLocale(languageFromDb);
     }
