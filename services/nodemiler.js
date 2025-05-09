@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer');
 
-async function sendEmail({ to, subject, text, html }) {
+async function sendEmail({ to, subject, text, html, attachments = [] }) {
   try {
     const transporter = nodemailer.createTransport({
       host: process.env.MAIL_HOST,
@@ -16,13 +16,19 @@ async function sendEmail({ to, subject, text, html }) {
       },
     });
 
-    const info = await transporter.sendMail({
+    const params = {
       from: '"TravelGO 👻" <WanderGid>',
       to,
       subject,
       text,
       html,
-    });
+    };
+
+    if (attachments.length) {
+      params.attachments = attachments;
+    }
+
+    const info = await transporter.sendMail(params);
 
     console.log('Message sent: %s', info.messageId);
     return info;

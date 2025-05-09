@@ -35,8 +35,8 @@ const uploadMedia = async (req, res) => {
     });
 
     if (avatar) {
-      await avatar.destroy({ transaction });
       fs.unlinkSync(avatar.path);
+      await avatar.destroy({ transaction });
     }
 
     await File.create(
