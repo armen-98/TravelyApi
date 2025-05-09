@@ -3,7 +3,7 @@ const debug = require('debug')('projects:server');
 const http = require('http');
 const db = require('../models');
 require('dotenv').config();
-
+const startJobs = require('../crone');
 /**
  * Get port from environment and store in Express.
  */
@@ -82,7 +82,7 @@ const startApp = async () => {
     debug('Listening on ' + bind);
   }
   db.sequelize.sync();
-
+  await startJobs();
   return port;
 };
 

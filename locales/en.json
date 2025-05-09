@@ -28,5 +28,6 @@
 	"url_invalid": "Invalid Url provided",
 	"profile_update_success": "Profile updated successfully",
 	"account_deactivated_success": "Account deactivated",
-	"account_deactivated": "Account is deactivated"
+	"account_deactivated": "Account is deactivated",
+	"contact_us_subject": "Contact Us"
 }
