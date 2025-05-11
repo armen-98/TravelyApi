@@ -1,0 +1,121 @@
+module.exports = {
+  up: async (queryInterface, Sequelize) => {
+    return queryInterface.bulkInsert('Roles', [
+      {
+        name: 'admin',
+        description: 'Administrator with full access to all features',
+        permissions: JSON.stringify({
+          users: { read: true, create: true, update: true, delete: true },
+          products: { read: true, create: true, update: true, delete: true },
+          categories: { read: true, create: true, update: true, delete: true },
+          blogs: { read: true, create: true, update: true, delete: true },
+          comments: { read: true, create: true, update: true, delete: true },
+          bookings: { read: true, create: true, update: true, delete: true },
+          claims: { read: true, create: true, update: true, delete: true },
+          settings: { read: true, update: true },
+        }),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: 'business',
+        description: 'Business owner who can manage their own listings',
+        permissions: JSON.stringify({
+          users: { read: true, create: false, update: false, delete: false },
+          products: {
+            read: true,
+            create: true,
+            update: true,
+            delete: true,
+            scope: 'own',
+          },
+          categories: {
+            read: true,
+            create: false,
+            update: false,
+            delete: false,
+          },
+          blogs: {
+            read: true,
+            create: true,
+            update: true,
+            delete: true,
+            scope: 'own',
+          },
+          comments: {
+            read: true,
+            create: true,
+            update: true,
+            delete: true,
+            scope: 'own',
+          },
+          bookings: {
+            read: true,
+            create: true,
+            update: true,
+            delete: true,
+            scope: 'own',
+          },
+          claims: {
+            read: true,
+            create: false,
+            update: true,
+            delete: false,
+            scope: 'own',
+          },
+          settings: { read: true, update: false },
+        }),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: 'user',
+        description: 'Regular user with basic permissions',
+        permissions: JSON.stringify({
+          users: {
+            read: true,
+            create: false,
+            update: false,
+            delete: false,
+            scope: 'own',
+          },
+          products: { read: true, create: false, update: false, delete: false },
+          categories: {
+            read: true,
+            create: false,
+            update: false,
+            delete: false,
+          },
+          blogs: { read: true, create: false, update: false, delete: false },
+          comments: {
+            read: true,
+            create: true,
+            update: true,
+            delete: true,
+            scope: 'own',
+          },
+          bookings: {
+            read: true,
+            create: true,
+            update: true,
+            delete: true,
+            scope: 'own',
+          },
+          claims: {
+            read: true,
+            create: true,
+            update: true,
+            delete: true,
+            scope: 'own',
+          },
+          settings: { read: true, update: false },
+        }),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ]);
+  },
+  down: async (queryInterface) => {
+    return queryInterface.bulkDelete('Roles', null, {});
+  },
+};

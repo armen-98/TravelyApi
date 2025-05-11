@@ -13,6 +13,14 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      description: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      },
+      permissions: {
+        type: Sequelize.JSON,
+        defaultValue: {},
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
@@ -22,6 +30,7 @@ module.exports = {
         type: Sequelize.DATE,
       },
     });
+    await queryInterface.addIndex('Roles', ['name']);
   },
   async down(queryInterface) {
     await queryInterface.dropTable('Roles');
