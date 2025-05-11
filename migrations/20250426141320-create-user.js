@@ -9,41 +9,86 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
+      name: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       firstName: {
         type: Sequelize.STRING,
         allowNull: true,
-        defaultValue: null,
       },
       lastName: {
         type: Sequelize.STRING,
         allowNull: true,
-        defaultValue: null,
       },
-      roleId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'Roles',
-          key: 'id',
-        },
-        allowNull: false,
-        onDelete: 'Cascade',
-      },
-      companyName: {
+      image: {
         type: Sequelize.STRING,
         allowNull: true,
-        defaultValue: null,
+      },
+      url: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      level: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+      },
+      description: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      },
+      tag: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      rate: {
+        type: Sequelize.FLOAT,
+        defaultValue: 0.0,
+      },
+      language: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      comment: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+      },
+      total: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+      },
+      email: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
       },
       username: {
         type: Sequelize.STRING,
         allowNull: false,
+        unique: true,
       },
       password: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      email: {
-        type: Sequelize.STRING,
+      verifiedAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      roleId: {
+        type: Sequelize.INTEGER,
         allowNull: false,
+        references: {
+          model: 'Roles',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'RESTRICT',
+      },
+      companyName: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: null,
       },
       otp: {
         type: Sequelize.STRING,
@@ -52,11 +97,6 @@ module.exports = {
       otpExpiration: {
         type: Sequelize.DATE,
         allowNull: true,
-        defaultValue: null,
-      },
-      verifiedAt: {
-        allowNull: true,
-        type: Sequelize.DATE,
         defaultValue: null,
       },
       verifyCode: {
@@ -103,6 +143,10 @@ module.exports = {
         type: Sequelize.DATE,
       },
     });
+
+    await queryInterface.addIndex('Users', ['email']);
+    await queryInterface.addIndex('Users', ['username']);
+    await queryInterface.addIndex('Users', ['roleId']);
   },
   async down(queryInterface) {
     await queryInterface.dropTable('Users');

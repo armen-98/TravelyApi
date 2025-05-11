@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Files', {
+    await queryInterface.createTable('Locations', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -11,20 +11,21 @@ module.exports = {
       },
       name: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
-      path: {
-        type: Sequelize.STRING,
+      type: {
+        type: Sequelize.ENUM('country', 'state', 'city'),
+        allowNull: false,
       },
-      FileableId: {
+      parentId: {
         type: Sequelize.INTEGER,
-      },
-      FileableType: {
-        type: Sequelize.STRING,
-      },
-      isMain: {
-        type: Sequelize.BOOLEAN,
         allowNull: true,
-        defaultValue: false,
+        references: {
+          model: 'Locations',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
       },
       createdAt: {
         allowNull: false,
@@ -35,8 +36,11 @@ module.exports = {
         type: Sequelize.DATE,
       },
     });
+
+    await queryInterface.addIndex('Locations', ['type']);
+    await queryInterface.addIndex('Locations', ['parentId']);
   },
   async down(queryInterface) {
-    await queryInterface.dropTable('Files');
+    await queryInterface.dropTable('Locations');
   },
 };

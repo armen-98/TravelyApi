@@ -1,8 +1,91 @@
-const { User, File, Customer, sequelize } = require('../models');
+const { Customer, File, sequelize } = require('../models');
+const { sendErrorEmail } = require('../services/nodemiler');
 const path = require('path');
 const fs = require('fs');
-const { sendErrorEmail } = require('../services/nodemiler');
-const { updateProfile } = require('../validations/customer');
+
+const { User } = require('../models');
+
+// Get user profile
+const getUser = async (req, res) => {
+  try {
+    const userId = req.user.id; // Assuming user ID is available from auth middleware
+
+    const user = await User.findByPk(userId, {
+      attributes: { exclude: ['password'] },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch user profile',
+      error: error.message,
+    });
+  }
+};
+
+// Update user profile
+const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user.id; // Assuming user ID is available from auth middleware
+    const { firstName, lastName, description, image } = req.body;
+
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    // Update user fields
+    if (firstName) user.firstName = firstName;
+    if (lastName) user.lastName = lastName;
+    if (description) user.description = description;
+    if (image) user.image = image;
+
+    // Update name if first or last name changed
+    if (firstName || lastName) {
+      user.name =
+        `${firstName || user.firstName} ${lastName || user.lastName}`.trim();
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully',
+      data: {
+        id: user.id,
+        name: user.name,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        image: user.image,
+        description: user.description,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update profile',
+      error: error.message,
+    });
+  }
+};
 
 const uploadMedia = async (req, res) => {
   let transaction;
@@ -111,6 +194,6 @@ const updateUserProfile = async (req, res) => {
 };
 
 module.exports = {
-  uploadMedia,
+  getUser,
   updateUserProfile,
 };

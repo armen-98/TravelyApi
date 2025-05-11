@@ -1,30 +1,53 @@
 'use strict';
 const { Model } = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
+module.exports = (sequelize, Sequelize) => {
   class File extends Model {
-    static associate({ User }) {
+    static associate({ User, Product }) {
       File.belongsTo(User, {
         foreignKey: 'FileableId',
         constraints: false,
       });
+      File.belongsTo(Product, { foreignKey: 'productId', as: 'product' });
     }
   }
   File.init(
     {
+      type: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      url: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      size: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      productId: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'Products',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
       name: {
-        type: DataTypes.STRING,
+        type: Sequelize.STRING,
       },
       path: {
-        type: DataTypes.STRING,
+        type: Sequelize.STRING,
       },
       FileableId: {
-        type: DataTypes.INTEGER,
+        type: Sequelize.INTEGER,
       },
       FileableType: {
-        type: DataTypes.STRING,
+        type: Sequelize.STRING,
       },
       isMain: {
-        type: DataTypes.BOOLEAN,
+        type: Sequelize.BOOLEAN,
         allowNull: true,
         defaultValue: false,
       },

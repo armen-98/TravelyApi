@@ -81,7 +81,6 @@ const startApp = async () => {
       typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
     debug('Listening on ' + bind);
   }
-  db.sequelize.sync();
   await startJobs();
   return port;
 };
