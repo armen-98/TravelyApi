@@ -85,4 +85,4 @@ const startApp = async () => {
   return port;
 };
 
-startApp().then((port) => console.log('Server started on port', port));
+startApp().then((port) => console.log(`🚀 Server is running on http://localhost:${port}`));
