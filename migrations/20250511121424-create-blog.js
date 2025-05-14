@@ -29,6 +29,16 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
+      imageId: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'Images',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+      },
       authorId: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -52,8 +62,22 @@ module.exports = {
     await queryInterface.addIndex('Blogs', ['authorId']);
     await queryInterface.addIndex('Blogs', ['status']);
     await queryInterface.addIndex('Blogs', ['title']);
+    // TODO: stex avelcrel ei imagi het relation
+    // await queryInterface.addColumn('Images', 'blogId', {
+    //   type: Sequelize.INTEGER,
+    //   allowNull: true,
+    //   references: {
+    //     model: 'Blogs',
+    //     key: 'id',
+    //   },
+    //   onUpdate: 'CASCADE',
+    //   onDelete: 'SET NULL',
+    // });
+    //
+    // await queryInterface.addIndex('Images', ['blogId']);
   },
   async down(queryInterface) {
     await queryInterface.dropTable('Blogs');
+    // await queryInterface.removeColumn('Images', 'blogId');
   },
 };

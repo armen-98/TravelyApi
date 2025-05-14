@@ -1,6 +1,6 @@
 'use strict';
 const { Model } = require('sequelize');
-const { Banner } = require('./index');
+
 module.exports = (sequelize, Sequelize) => {
   class Widget extends Model {
     static associate({ Product, Category, Blog, Banner }) {
@@ -22,7 +22,7 @@ module.exports = (sequelize, Sequelize) => {
         otherKey: 'blogId',
         as: 'blogs',
       });
-      Widget.belongsTo(Banner, { foreignKey: 'widgetId', as: 'banners' });
+      Widget.belongsTo(Banner, { foreignKey: 'id', as: 'banners' });
     }
   }
   Widget.init(

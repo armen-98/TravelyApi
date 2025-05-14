@@ -5,7 +5,7 @@ module.exports = (sequelize, Sequelize) => {
     static associate({ User, Category, Image, Comment, Widget }) {
       Blog.belongsTo(User, { foreignKey: 'authorId', as: 'author' });
       Blog.belongsTo(Category, { foreignKey: 'categoryId', as: 'category' });
-      Blog.belongsTo(Image, { foreignKey: 'imageId', as: 'image' });
+      Blog.belongsTo(Image, { targetKey: 'id', as: 'image' });
       Blog.hasMany(Comment, { foreignKey: 'blogId', as: 'comments' });
       Blog.belongsToMany(Widget, {
         through: 'WidgetBlogs',

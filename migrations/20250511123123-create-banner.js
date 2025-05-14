@@ -34,8 +34,21 @@ module.exports = {
     });
 
     await queryInterface.addIndex('Banners', ['widgetId']);
+    // TODO: stex avelcrel ei imagi het relation
+    // await queryInterface.addColumn('Images', 'bannerId', {
+    //   type: Sequelize.INTEGER,
+    //   allowNull: true,
+    //   references: {
+    //     model: 'Banners',
+    //     key: 'id',
+    //   },
+    //   onDelete: 'SET NULL',
+    // });
+    //
+    // await queryInterface.addIndex('Images', ['bannerId']);
   },
   async down(queryInterface) {
     await queryInterface.dropTable('Banners');
+    // await queryInterface.removeColumn('Images', 'bannerId');
   },
 };

@@ -5,7 +5,7 @@ module.exports = (sequelize, Sequelize) => {
   class Banner extends Model {
     static associate({ Widget, Image }) {
       Banner.belongsTo(Widget, { foreignKey: 'widgetId', as: 'banners' });
-      Banner.belongsTo(Image, { foreignKey: 'bannerId', as: 'image' });
+      Banner.belongsTo(Image, { foreignKey: 'id', as: 'image' });
     }
   }
   Banner.init(
