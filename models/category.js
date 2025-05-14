@@ -17,7 +17,12 @@ module.exports = (sequelize, Sequelize) => {
         otherKey: 'productId',
         as: 'featuredProducts',
       });
-      Category.hasMany(Blog, { foreignKey: 'categoryId', as: 'blogs' });
+      Category.belongsToMany(Blog, {
+        through: 'BlogCategory',
+        foreignKey: 'categoryId',
+        otherKey: 'blogId',
+        as: 'blogs',
+      });
       Category.belongsToMany(Widget, {
         through: 'WidgetCategories',
         foreignKey: 'categoryId',

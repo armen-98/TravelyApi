@@ -23,6 +23,11 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
+      type: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: 'slider',
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

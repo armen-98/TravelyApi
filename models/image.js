@@ -2,11 +2,12 @@
 const { Model } = require('sequelize');
 module.exports = (sequelize, Sequelize) => {
   class Image extends Model {
-    static associate({ Product, Blog, Category }) {
+    static associate({ Product, Blog, Category, Banner }) {
       Image.hasOne(Product, { foreignKey: 'imageId', as: 'featuredProduct' });
       Image.belongsTo(Product, { foreignKey: 'productId', as: 'product' });
-      Image.hasOne(Blog, { foreignKey: 'imageId', as: 'featuredBlog' });
+      Image.belongsTo(Blog, { foreignKey: 'blogId', as: 'featuredBlog' });
       Image.belongsTo(Category, { foreignKey: 'categoryId', as: 'categories' });
+      Image.belongsTo(Banner, { foreignKey: 'bannerId', as: 'banner' });
     }
   }
   Image.init(
