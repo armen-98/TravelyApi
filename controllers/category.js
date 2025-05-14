@@ -3,13 +3,13 @@ const { Category, Image } = require('../models');
 // Get categories list
 const getCategories = async (req, res) => {
   try {
-    const { parent_id } = req.query;
+    const { category_id } = req.query;
 
     const whereConditions = { type: 'category' };
 
     // If parent_id is provided, filter by parent
-    if (parent_id) {
-      whereConditions.parentId = parent_id;
+    if (category_id) {
+      whereConditions.parentId = category_id;
     } else {
       // If no parent_id, get only top-level categories
       whereConditions.parentId = null;

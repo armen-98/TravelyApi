@@ -11,7 +11,173 @@ const {
 // Get home initialization data
 const getHomeInit = async (req, res) => {
   try {
-    // Get widgets
+    // Get sliders (banners)
+    const sliders = await Banner.findAll({
+      where: { type: 'slider' },
+      include: [
+        {
+          model: Image,
+          as: 'image',
+        },
+      ],
+      limit: 5,
+      order: [['id', 'DESC']],
+    });
+
+    // Get categories
+    const categories = await Category.findAll({
+      where: { type: 'category', parentId: null },
+      include: [
+        {
+          model: Image,
+          as: 'image',
+        },
+        {
+          model: Category,
+          as: 'subcategories',
+          include: [
+            {
+              model: Image,
+              as: 'image',
+            },
+          ],
+        },
+      ],
+      limit: 10,
+      order: [['count', 'DESC']],
+    });
+
+    // Get locations
+    const locations = await Category.findAll({
+      where: { type: 'location' },
+      include: [
+        {
+          model: Image,
+          as: 'image',
+        },
+      ],
+      limit: 10,
+      order: [['count', 'DESC']],
+    });
+
+    // Get recent posts (products)
+    const recentPosts = await Product.findAll({
+      include: [
+        {
+          model: Image,
+          as: 'image',
+        },
+        {
+          model: User,
+          as: 'author',
+          attributes: ['id', 'name', 'image'],
+        },
+        {
+          model: Category,
+          as: 'category',
+          include: [
+            {
+              model: Image,
+              as: 'image',
+            },
+          ],
+        },
+      ],
+      limit: 10,
+      order: [['createdAt', 'DESC']],
+    });
+
+    // Format response
+    const formattedSliders = sliders.map((slider) =>
+      slider.image ? slider.image.full : '',
+    );
+
+    const formattedCategories = categories.map((category) => ({
+      term_id: category.id,
+      name: category.title,
+      count: category.count,
+      image: category.image
+        ? {
+            id: category.image.id,
+            full: { url: category.image.full },
+            thumb: { url: category.image.thumb },
+          }
+        : undefined,
+      icon: category.icon,
+      color: category.color,
+      taxonomy: category.type,
+      has_child: category.subcategories && category.subcategories.length > 0,
+      children: category.subcategories
+        ? category.subcategories.map((sub) => ({
+            term_id: sub.id,
+            name: sub.title,
+            count: sub.count,
+            image: sub.image
+              ? {
+                  id: sub.image.id,
+                  full: { url: sub.image.full },
+                  thumb: { url: sub.image.thumb },
+                }
+              : undefined,
+            icon: sub.icon,
+            color: sub.color,
+            taxonomy: sub.type,
+            has_child: false,
+          }))
+        : [],
+    }));
+
+    const formattedLocations = locations.map((location) => ({
+      term_id: location.id,
+      name: location.title,
+      count: location.count,
+      image: location.image
+        ? {
+            id: location.image.id,
+            full: { url: location.image.full },
+            thumb: { url: location.image.thumb },
+          }
+        : undefined,
+      icon: location.icon,
+      color: location.color,
+      taxonomy: location.type,
+      has_child: false,
+    }));
+
+    const formattedRecentPosts = recentPosts.map((product) => ({
+      ID: product.id,
+      post_title: product.title,
+      post_date: product.createdAt,
+      rating_avg: product.rate,
+      rating_count: product.numRate,
+      wishlist: false,
+      image: product.image
+        ? {
+            id: product.image.id,
+            full: { url: product.image.full },
+            thumb: { url: product.image.thumb },
+          }
+        : undefined,
+      author: product.author
+        ? {
+            id: product.author.id,
+            name: product.author.name,
+            user_photo: product.author.image,
+          }
+        : undefined,
+      category: product.category
+        ? {
+            term_id: product.category.id,
+            name: product.category.title,
+            taxonomy: product.category.type,
+          }
+        : undefined,
+      price_min: product.priceMin,
+      price_max: product.priceMax,
+      address: product.address,
+    }));
+
+    // Get widgets for additional data
     const widgets = await Widget.findAll({
       order: [['position', 'ASC']],
       include: [
@@ -68,7 +234,7 @@ const getHomeInit = async (req, res) => {
       ],
     });
 
-    // Format response
+    // Format widgets
     const formattedWidgets = widgets.map((widget) => {
       const baseWidget = {
         title: widget.title,
@@ -193,7 +359,13 @@ const getHomeInit = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: formattedWidgets,
+      data: {
+        sliders: formattedSliders,
+        categories: formattedCategories,
+        locations: formattedLocations,
+        recent_posts: formattedRecentPosts,
+        widgets: formattedWidgets,
+      },
     });
   } catch (error) {
     console.error('Error fetching home data:', error);
