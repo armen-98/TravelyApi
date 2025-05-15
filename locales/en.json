@@ -15,6 +15,8 @@
 	"username_invalid_length": "Username must be between 3 and 20 characters",
 	"username_invalid_format": "Username can only contain letters and numbers",
 	"invalid_role": "invalid role",
+	"authentication_required": "Authentication required",
+	"access_denied_admin_privileges_required": "Access denied. Admin privileges required.",
 	"user_not_created": "User not created",
 	"success_message": "Request success",
 	"invalid_otp": "Invalid code, please check again",
@@ -29,5 +31,8 @@
 	"profile_update_success": "Profile updated successfully",
 	"account_deactivated_success": "Account deactivated",
 	"account_deactivated": "Account is deactivated",
-	"contact_us_subject": "Contact Us"
+	"contact_us_subject": "Contact Us",
+	"user_updated_successfully": "User updated successfully",
+	"user_deleted_successfully": "User deleted successfully",
+	"cannot_delete_own_account_through_this_endpoint": "You cannot delete your own account through this endpoint"
 }
