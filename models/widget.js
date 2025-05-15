@@ -22,7 +22,7 @@ module.exports = (sequelize, Sequelize) => {
         otherKey: 'blogId',
         as: 'blogs',
       });
-      Widget.belongsTo(Banner, { foreignKey: 'widgetId', as: 'banners' });
+      Widget.hasMany(Banner, { foreignKey: 'widgetId', as: 'banners' });
     }
   }
   Widget.init(

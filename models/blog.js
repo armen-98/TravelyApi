@@ -4,8 +4,13 @@ module.exports = (sequelize, Sequelize) => {
   class Blog extends Model {
     static associate({ User, Category, Image, Comment, Widget }) {
       Blog.belongsTo(User, { foreignKey: 'authorId', as: 'author' });
-      Blog.belongsTo(Category, { foreignKey: 'categoryId', as: 'category' });
-      Blog.belongsTo(Image, { foreignKey: 'imageId', as: 'image' });
+      Blog.belongsToMany(Category, {
+        through: 'BlogCategory',
+        foreignKey: 'blogId',
+        otherKey: 'categoryId',
+        as: 'categories',
+      });
+      Blog.hasOne(Image, { foreignKey: 'blogId', as: 'image' });
       Blog.hasMany(Comment, { foreignKey: 'blogId', as: 'comments' });
       Blog.belongsToMany(Widget, {
         through: 'WidgetBlogs',

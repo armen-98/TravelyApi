@@ -5,7 +5,7 @@ module.exports = (sequelize, Sequelize) => {
   class Banner extends Model {
     static associate({ Widget, Image }) {
       Banner.belongsTo(Widget, { foreignKey: 'widgetId', as: 'banners' });
-      Banner.belongsTo(Image, { foreignKey: 'bannerId', as: 'image' });
+      Banner.hasOne(Image, { foreignKey: 'bannerId', as: 'image' });
     }
   }
   Banner.init(
@@ -23,6 +23,11 @@ module.exports = (sequelize, Sequelize) => {
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
+      },
+      type: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: 'slider',
       },
     },
     {
