@@ -7,12 +7,7 @@ module.exports = (sequelize, Sequelize) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate({ Admin, Moderator }) {
-      // Admin.hasMany(Moderator, {
-      //   as: 'moderators',
-      //   foreignKey: 'adminId',
-      // });
-    }
+    static associate() {}
   }
   admin.init(
     {
