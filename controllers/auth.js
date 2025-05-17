@@ -1,6 +1,6 @@
 const { sendErrorEmail } = require('../services/nodemiler');
 const jwt = require('jsonwebtoken');
-const { User, Role, Customer, sequelize } = require('../models');
+const { User, Role, sequelize } = require('../models');
 const authService = require('../services/auth');
 const validator = require('validator');
 
@@ -72,19 +72,6 @@ const signUp = async (req, res) => {
         username,
         password: hashedPassword,
         roleId: role.id,
-      },
-      { transaction },
-    );
-
-    if (!newUser) {
-      await transaction.rollback();
-      return res.status(400).json({
-        message: res.__('user_not_created'),
-      });
-    }
-
-    const customer = await Customer.create(
-      {
         userId: newUser.id,
         location: 'AM',
         language: 'hy',
@@ -101,17 +88,20 @@ const signUp = async (req, res) => {
       { transaction },
     );
 
-    const token = authService.generateToken(newUser.id, 'user', '7d');
+    if (!newUser) {
+      await transaction.rollback();
+      return res.status(400).json({
+        message: res.__('user_not_created'),
+      });
+    }
 
+    const token = authService.generateToken(newUser.id, 'user', '7d');
     delete newUser.password;
     await transaction.commit();
     return res.status(201).json({
       data: {
         token,
-        user: {
-          ...newUser,
-          ...customer,
-        },
+        user: newUser,
       },
       message: req.__('register_success'),
     });
@@ -139,7 +129,6 @@ const signIn = async (req, res) => {
 
     const user = await User.findOne({
       where: { username },
-      include: { model: Customer, as: 'customer' },
     });
     if (!user) {
       return res.status(404).json({ message: res.__('not_found_user') });
@@ -169,10 +158,7 @@ const signIn = async (req, res) => {
     return res.status(200).json({
       data: {
         token,
-        user: {
-          ...user.dataValues,
-          ...user.customer.dataValues,
-        },
+        user,
       },
       message: res.__('login_success'),
     });
@@ -206,7 +192,6 @@ const tokenValidate = async (req, res) => {
     }
     const user = await User.findOne({
       where: { id: decoded.id },
-      include: { model: Customer, as: 'customer' },
     });
     if (!user) {
       return res.status(404).json({ message: res.__('not_found_user') });
@@ -214,10 +199,7 @@ const tokenValidate = async (req, res) => {
 
     return res.status(200).json({
       data: {
-        user: {
-          ...user.dataValues,
-          ...user.customer.dataValues,
-        },
+        user,
       },
       code: 'jwt_auth_valid_token',
       message: res.__('token_validate_success'),
@@ -237,17 +219,13 @@ const getAuthUser = async (req, res) => {
   try {
     const user = await User.findOne({
       where: { id: req.user.id },
-      include: { model: Customer, as: 'customer' },
     });
 
     const token = authService.generateToken(user.id, 'user', '7d');
 
     return res.status(200).json({
       data: {
-        user: {
-          ...user.dataValues,
-          ...user.customer.dataValues,
-        },
+        user,
         token,
       },
       message: res.__('success_message'),
