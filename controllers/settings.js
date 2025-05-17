@@ -1,4 +1,4 @@
-const { Setting, Customer, Category, Location, Image } = require('../models');
+const { Setting, User, Category, Location, Image } = require('../models');
 
 const changeLanguage = async (req, res) => {
   try {
@@ -19,11 +19,11 @@ const changeLanguage = async (req, res) => {
       });
     }
 
-    await Customer.update(
+    await User.update(
       {
         language,
       },
-      { where: { userId: user.id } },
+      { where: { id: user.id } },
     );
 
     return res.status(200).json({
@@ -39,8 +39,8 @@ const changeLanguage = async (req, res) => {
 };
 const getSettings = async (req, res) => {
   try {
-    // Get the main settings
     const settings = await Setting.findOne({
+      where: { deviceId: req.headers.deviceid },
       order: [['createdAt', 'DESC']],
     });
 
@@ -144,6 +144,8 @@ const getSettings = async (req, res) => {
           unit_price: settings?.unit || 'USD',
           time_min: settings?.startHour || '08:00',
           time_max: settings?.endHour || '18:00',
+          enableSubmit: settings?.enableSubmit || false,
+          ...settings,
         },
         view_option: {
           view_address_use: settings?.useViewAddress || true,
