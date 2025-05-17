@@ -11,19 +11,21 @@ const adminSignIn = async (req, res) => {
     if (!email || !password) {
       return res
         .status(400)
-        .json({ message: 'Please provide email and password' });
+        .json({ message: res.__('provide_email_and_password') });
     }
 
     // Find admin by email
     const admin = await Admin.findOne({ where: { email } });
     if (!admin) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res
+        .status(401)
+        .json({ message: res.__('invalid_email_or_password') });
     }
 
     // Check if admin is active
     if (admin.status !== 'active') {
       return res.status(403).json({
-        message: 'Your account is inactive. Please contact a super admin.',
+        message: res.__('account_is_inactive'),
       });
     }
 
