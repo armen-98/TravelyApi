@@ -10,6 +10,7 @@ const getWishlist = async (req, res) => {
       include: [
         {
           model: Product,
+          as: 'product',
           include: [
             {
               model: Image,
