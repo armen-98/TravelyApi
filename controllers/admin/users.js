@@ -1,6 +1,6 @@
 const { Op } = require('sequelize');
-const { User, Role } = require('../models');
-const { sendErrorEmail } = require('../services/nodemiler');
+const { User, Role } = require('../../models');
+const { sendErrorEmail } = require('../../services/nodemiler');
 
 // Get all users (admin only)
 const getUsers = async (req, res) => {

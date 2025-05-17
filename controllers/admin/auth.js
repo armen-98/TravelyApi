@@ -1,6 +1,6 @@
-const authService = require('../services/auth');
-const { Admin } = require('../models');
-const { sendErrorEmail } = require('../services/nodemiler');
+const authService = require('../../services/auth');
+const { Admin } = require('../../models');
+const { sendErrorEmail } = require('../../services/nodemiler');
 
 // Admin sign in
 const adminSignIn = async (req, res) => {
