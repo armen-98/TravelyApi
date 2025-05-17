@@ -3,6 +3,7 @@ const router = express.Router();
 
 const adminRouter = require('./admin');
 const authRouter = require('./auth');
+const adminAuthRouter = require('./admin-auth');
 const settingsRouter = require('./settings');
 const userRouter = require('./user');
 const contactRouter = require('./contact');
@@ -25,6 +26,7 @@ const wishlistRouter = require('./wishlist');
 
 router.use('/admin', adminRouter);
 router.use('/auth', authRouter);
+router.use('/admin-auth', adminAuthRouter);
 router.use('/settings', settingsRouter);
 router.use('/user', userRouter);
 router.use('/contact', contactRouter);

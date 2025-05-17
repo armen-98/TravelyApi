@@ -67,12 +67,7 @@ const getUsers = async (req, res) => {
     res.status(200).json({
       success: true,
       data: users,
-      pagination: {
-        page: Number.parseInt(page),
-        limit: Number.parseInt(limit),
-        total,
-        pages: Math.ceil(total / Number.parseInt(limit)),
-      },
+      total,
     });
   } catch (error) {
     console.error('Get users error:', error);
