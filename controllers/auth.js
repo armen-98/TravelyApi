@@ -72,7 +72,6 @@ const signUp = async (req, res) => {
         username,
         password: hashedPassword,
         roleId: role.id,
-        userId: newUser.id,
         location: 'AM',
         language: 'hy',
         name: '',
