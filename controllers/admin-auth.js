@@ -1,5 +1,6 @@
 const authService = require('../services/auth');
 const { Admin } = require('../models');
+const { sendErrorEmail } = require('../services/nodemiler');
 
 // Admin sign in
 const adminSignIn = async (req, res) => {
@@ -29,7 +30,7 @@ const adminSignIn = async (req, res) => {
     // Check if password matches
     const isMatch = await authService.comparePassword(password, admin.password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ message: res.__('invalid_password') });
     }
 
     // Update last login time
@@ -51,9 +52,14 @@ const adminSignIn = async (req, res) => {
       },
       token,
     });
-  } catch (error) {
-    console.error('Admin sign in error:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+  } catch (e) {
+    console.log('Catch error for admin signIn', e);
+    if (process.env.NODE_ENV !== 'development') {
+      await sendErrorEmail(e);
+    }
+    return res.status(500).json({
+      message: res.__('internal_error'),
+    });
   }
 };
 

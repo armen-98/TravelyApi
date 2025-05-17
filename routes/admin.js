@@ -9,7 +9,6 @@ const { verifyToken } = require('../middlewares/authMiddleware');
 router.use(verifyToken);
 router.use(isAdmin);
 
-router.post('/admin', adminController.createAdmin);
 // User management routes
 router.get('/users', adminController.getUsers);
 router.get('/users/:id', adminController.getUserDetails);

@@ -1,8 +1,7 @@
 const { sendErrorEmail } = require('../services/nodemiler');
 const jwt = require('jsonwebtoken');
 const { User, Role, Customer, sequelize } = require('../models');
-const bcrypt = require('bcryptjs');
-const crypto = require('crypto');
+const authService = require('../services/auth');
 const validator = require('validator');
 
 const isValidEmail = (email) => {
@@ -47,7 +46,7 @@ const signUp = async (req, res) => {
       return res.status(400).json({ message: res.__('exist_username') });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await authService.hashPassword(password);
 
     let role = await Role.findOne({ where: { name: 'customer' }, transaction });
 
@@ -102,9 +101,8 @@ const signUp = async (req, res) => {
       { transaction },
     );
 
-    const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET, {
-      expiresIn: '7d',
-    });
+    const token = authService.generateToken(newUser.id, 'user', '7d');
+
     delete newUser.password;
     await transaction.commit();
     return res.status(201).json({
@@ -150,15 +148,14 @@ const signIn = async (req, res) => {
       return res.status(400).json({ message: res.__('account_deactivated') });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
+    const isMatch = await authService.comparePassword(password, user.password);
+    if (!isMatch) {
       return res.status(401).json({ message: res.__('invalid_password') });
     }
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-      expiresIn: '7d',
-    });
-    // const otp = crypto.randomInt(100000, 999999).toString();
+    const token = authService.generateToken(user.id, 'user', '7d');
+
+    // const { otp, otpExpiration } = authService.generateOtp();
     // await user.update({ otp });
     // await user.reload();
     // const sendEmail = require('../services/nodemiler').sendEmail;
@@ -242,9 +239,8 @@ const getAuthUser = async (req, res) => {
       where: { id: req.user.id },
       include: { model: Customer, as: 'customer' },
     });
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-      expiresIn: '7d',
-    });
+
+    const token = authService.generateToken(user.id, 'user', '7d');
 
     return res.status(200).json({
       data: {
@@ -283,10 +279,7 @@ const forgotPassword = async (req, res) => {
       return res.status(404).json({ message: res.__('not_found_user') });
     }
 
-    const otp = crypto.randomInt(100000, 999999).toString();
-
-    const otpExpiration = new Date();
-    otpExpiration.setMinutes(otpExpiration.getMinutes() + 10);
+    const { otp, otpExpiration } = authService.generateOtp();
 
     await User.update(
       { otp, otpExpiration },
@@ -400,7 +393,7 @@ const changePassword = async (req, res) => {
       return res.status(400).json({ message: res.__('otp_not_verified') });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await authService.hashPassword(password);
 
     await User.update(
       { password: hashedPassword },

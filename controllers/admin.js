@@ -1,20 +1,6 @@
 const { Op } = require('sequelize');
 const { User, Role } = require('../models');
-
-const createAdmin = async (req, res) => {
-  try {
-    console.log('data');
-    return res.status(200).json({
-      data: {},
-      message: 'Success',
-    });
-  } catch (e) {
-    console.log('Catch for createAdmin', e);
-    return res.status(500).json({
-      message: 'Internal server error',
-    });
-  }
-};
+const { sendErrorEmail } = require('../services/nodemiler');
 
 // Get all users (admin only)
 const getUsers = async (req, res) => {
@@ -69,8 +55,11 @@ const getUsers = async (req, res) => {
       data: users,
       total,
     });
-  } catch (error) {
-    console.error('Get users error:', error);
+  } catch (e) {
+    console.error('Get users error:', e);
+    if (process.env.NODE_ENV !== 'development') {
+      await sendErrorEmail(e);
+    }
     return res.status(500).json({
       message: res.__('internal_error'),
     });
@@ -109,8 +98,11 @@ const getUserDetails = async (req, res) => {
       success: true,
       data: user,
     });
-  } catch (error) {
-    console.error('Get user details error:', error);
+  } catch (e) {
+    console.error('Get user details error:', e);
+    if (process.env.NODE_ENV !== 'development') {
+      await sendErrorEmail(e);
+    }
     return res.status(500).json({
       message: res.__('internal_error'),
     });
@@ -147,9 +139,14 @@ const updateUser = async (req, res) => {
         isVerified: user.isVerified,
       },
     });
-  } catch (error) {
-    console.error('Update user error:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+  } catch (e) {
+    console.error('Update user error:', e);
+    if (process.env.NODE_ENV !== 'development') {
+      await sendErrorEmail(e);
+    }
+    return res.status(500).json({
+      message: res.__('internal_error'),
+    });
   }
 };
 
@@ -177,8 +174,11 @@ const deleteUser = async (req, res) => {
       success: true,
       message: res.__('user_deleted_successfully'),
     });
-  } catch (error) {
-    console.error('Delete user error:', error);
+  } catch (e) {
+    console.error('Delete user error:', e);
+    if (process.env.NODE_ENV !== 'development') {
+      await sendErrorEmail(e);
+    }
     return res.status(500).json({
       message: res.__('internal_error'),
     });
@@ -186,7 +186,6 @@ const deleteUser = async (req, res) => {
 };
 
 module.exports = {
-  createAdmin,
   getUsers,
   getUserDetails,
   updateUser,

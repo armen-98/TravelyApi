@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 const sendEmail = require('../services/nodemiler').sendEmail;
 
@@ -19,6 +20,24 @@ class AuthService {
     return jwt.sign({ id, type }, process.env.JWT_SECRET, {
       expiresIn,
     });
+  }
+
+  /**
+   * Generate a secure 6-digit OTP and expiration time
+   * @returns {Object} Object containing OTP and expiration time
+   */
+  generateOtp() {
+    // Generate a secure random 6-digit number
+    const otp = crypto.randomInt(100000, 999999).toString();
+
+    // Set expiration time to 10 minutes from now
+    const otpExpiration = new Date();
+    otpExpiration.setMinutes(otpExpiration.getMinutes() + 10);
+
+    return {
+      otp,
+      otpExpiration,
+    };
   }
 
   /**
