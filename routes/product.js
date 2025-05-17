@@ -5,12 +5,15 @@ const {
   getProduct,
   saveProduct,
   deleteProduct,
+  getProductForm,
 } = require('../controllers/product.js');
 
 const router = express.Router();
 
 // Get product listings
 router.get('/list', getListings);
+
+router.get('/form', getProductForm);
 
 // Get product details
 router.get('/view/:id', getProduct);

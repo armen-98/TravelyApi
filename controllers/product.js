@@ -15,6 +15,197 @@ const {
 } = require('../models');
 const { Op } = require('sequelize');
 
+const getProductForm = async (req, res) => {
+  try {
+    const categories = await Category.findAll({
+      where: {
+        type: 'category',
+      },
+      include: [
+        {
+          model: Image,
+          as: 'image',
+        },
+        {
+          model: Category,
+          as: 'subcategories',
+          include: [
+            {
+              model: Image,
+              as: 'image',
+            },
+          ],
+        },
+      ],
+      order: [
+        ['title', 'ASC'],
+        [{ model: Category, as: 'subcategories' }, 'title', 'ASC'],
+      ],
+    });
+
+    // Get features
+    const features = await Category.findAll({
+      where: { type: 'feature' },
+      include: [
+        {
+          model: Image,
+          as: 'image',
+        },
+      ],
+      order: [['title', 'ASC']],
+    });
+
+    // Get countries
+    const countries = await Location.findAll({
+      where: {
+        type: 'country',
+        parentId: null,
+      },
+      order: [['name', 'ASC']],
+    });
+
+    // Get states
+    const states = await Location.findAll({
+      where: { type: 'state' },
+      order: [['name', 'ASC']],
+    });
+
+    // Get cities
+    const cities = await Location.findAll({
+      where: { type: 'city' },
+      order: [['name', 'ASC']],
+    });
+
+    // Get tags
+    const tags = await Tag.findAll({
+      order: [['name', 'ASC']],
+    });
+
+    // Get facilities
+    const facilities = await Facility.findAll({
+      order: [['name', 'ASC']],
+    });
+
+    // Format categories
+    const formattedCategories = categories.map((category) => ({
+      term_id: category.id,
+      name: category.title,
+      count: category.count || 0,
+      taxonomy: category.type,
+      icon: category.icon,
+      color: category.color,
+      has_child: category.subcategories && category.subcategories.length > 0,
+      image: category.image
+        ? {
+            id: category.image.id,
+            full: { url: category.image.full },
+            thumb: { url: category.image.thumb },
+          }
+        : null,
+      children: category.subcategories
+        ? category.subcategories.map((subcat) => ({
+            term_id: subcat.id,
+            name: subcat.title,
+            count: subcat.count || 0,
+            taxonomy: subcat.type,
+            icon: subcat.icon,
+            color: subcat.color,
+            has_child: false,
+            image: subcat.image
+              ? {
+                  id: subcat.image.id,
+                  full: { url: subcat.image.full },
+                  thumb: { url: subcat.image.thumb },
+                }
+              : null,
+          }))
+        : [],
+    }));
+
+    // Format features
+    const formattedFeatures = features.map((feature) => ({
+      term_id: feature.id,
+      name: feature.title,
+      count: feature.count || 0,
+      taxonomy: feature.type,
+      icon: feature.icon,
+      color: feature.color,
+      image: feature.image
+        ? {
+            id: feature.image.id,
+            full: { url: feature.image.full },
+            thumb: { url: feature.image.thumb },
+          }
+        : null,
+    }));
+
+    // Format locations
+    const formattedCountries = countries.map((country) => ({
+      term_id: country.id,
+      name: country.name,
+      count: country.count || 0,
+      taxonomy: 'location',
+      has_child: true,
+    }));
+
+    const formattedStates = states.map((state) => ({
+      term_id: state.id,
+      name: state.name,
+      count: state.count || 0,
+      taxonomy: 'location',
+      parent_id: state.parentId,
+      has_child: true,
+    }));
+
+    const formattedCities = cities.map((city) => ({
+      term_id: city.id,
+      name: city.name,
+      count: city.count || 0,
+      taxonomy: 'location',
+      parent_id: city.parentId,
+      has_child: false,
+    }));
+
+    // Format tags
+    const formattedTags = tags.map((tag) => ({
+      id: tag.id,
+      name: tag.name,
+      slug: tag.slug,
+      count: tag.count || 0,
+      color: tag.color,
+    }));
+
+    // Format facilities
+    const formattedFacilities = facilities.map((facility) => ({
+      id: facility.id,
+      name: facility.name,
+      icon: facility.icon,
+      description: facility.description,
+      count: facility.count || 0,
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: {
+        categories: formattedCategories,
+        features: formattedFeatures,
+        countries: formattedCountries,
+        states: formattedStates,
+        cities: formattedCities,
+        tags: formattedTags,
+        facilities: formattedFacilities,
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching product form data:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch product form data',
+      error: error.message,
+    });
+  }
+};
+
 // Get product listings
 const getListings = async (req, res) => {
   try {
@@ -932,4 +1123,5 @@ module.exports = {
   getProduct,
   saveProduct,
   deleteProduct,
+  getProductForm,
 };

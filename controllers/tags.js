@@ -5,7 +5,7 @@ const slugify = require('slugify');
 // Get all tags
 const getTags = async (req, res) => {
   try {
-    const { search, limit = 50 } = req.query;
+    const { s: search, limit = 50 } = req.query;
 
     const whereConditions = {};
     if (search) {
