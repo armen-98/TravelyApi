@@ -9,18 +9,15 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      name: {
-        type: Sequelize.STRING,
+      userId: {
+        type: Sequelize.INTEGER,
         allowNull: false,
-      },
-      email: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        unique: true,
-      },
-      password: {
-        type: Sequelize.STRING,
-        allowNull: false,
+        references: {
+          model: 'Users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       phone: {
         type: Sequelize.STRING,
@@ -68,29 +65,6 @@ module.exports = {
             approve: true,
           },
         },
-      },
-      lastLoginAt: {
-        type: Sequelize.DATE,
-        allowNull: true,
-      },
-      otp: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      otpExpiration: {
-        type: Sequelize.DATE,
-        allowNull: true,
-        defaultValue: null,
-      },
-      deactivatedAt: {
-        allowNull: true,
-        type: Sequelize.DATE,
-        defaultValue: null,
-      },
-      deletedAt: {
-        allowNull: true,
-        type: Sequelize.DATE,
-        defaultValue: null,
       },
       createdAt: {
         allowNull: false,

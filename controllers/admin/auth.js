@@ -1,5 +1,5 @@
 const authService = require('../../services/auth');
-const { Admin } = require('../../models');
+const { Admin, User } = require('../../models');
 const { sendErrorEmail } = require('../../services/nodemiler');
 
 // Admin sign in
@@ -15,42 +15,47 @@ const adminSignIn = async (req, res) => {
     }
 
     // Find admin by email
-    const admin = await Admin.findOne({ where: { email } });
-    if (!admin) {
+    const user = await User.findOne({
+      where: { email },
+      include: [
+        {
+          model: Admin,
+          as: 'admin',
+        },
+      ],
+    });
+
+    if (!user) {
       return res
         .status(401)
         .json({ message: res.__('invalid_email_or_password') });
     }
 
     // Check if admin is active
-    if (admin.status !== 'active') {
+    if (user.admin?.status !== 'active') {
       return res.status(403).json({
         message: res.__('account_is_inactive'),
       });
     }
 
     // Check if password matches
-    const isMatch = await authService.comparePassword(password, admin.password);
+    const isMatch = await authService.comparePassword(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: res.__('invalid_password') });
     }
 
-    // Update last login time
-    admin.lastLoginAt = new Date();
-    await admin.save();
-
     // Generate token
-    const token = authService.generateToken(admin.id, 'admin', '1d');
+    const token = authService.generateToken(user.id, 'admin', '1d');
 
     // Return admin data and token
     res.status(200).json({
       success: true,
       data: {
-        id: admin.id,
-        name: admin.name,
-        email: admin.email,
-        isSuperAdmin: admin.isSuperAdmin,
-        profileImage: admin.profileImage,
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        isSuperAdmin: user.admin?.isSuperAdmin,
+        profileImage: user.admin?.profileImage,
       },
       token,
     });

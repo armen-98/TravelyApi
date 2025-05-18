@@ -7,29 +7,12 @@ module.exports = (sequelize, Sequelize) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate() {}
+    static associate({ User }) {
+      admin.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+    }
   }
   admin.init(
     {
-      name: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      email: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        unique: true,
-        validate: {
-          isEmail: true,
-        },
-      },
-      password: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        validate: {
-          len: [6, 100],
-        },
-      },
       phone: {
         type: Sequelize.STRING,
         allowNull: true,
@@ -66,29 +49,6 @@ module.exports = (sequelize, Sequelize) => {
             approve: true,
           },
         },
-      },
-      lastLoginAt: {
-        type: Sequelize.DATE,
-        allowNull: true,
-      },
-      otp: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      otpExpiration: {
-        type: Sequelize.DATE,
-        allowNull: true,
-        defaultValue: null,
-      },
-      deletedAt: {
-        allowNull: true,
-        type: Sequelize.DATE,
-        defaultValue: null,
-      },
-      deactivatedAt: {
-        allowNull: true,
-        type: Sequelize.DATE,
-        defaultValue: null,
       },
     },
     {
