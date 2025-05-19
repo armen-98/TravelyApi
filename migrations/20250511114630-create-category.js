@@ -26,7 +26,7 @@ module.exports = {
         allowNull: true,
       },
       type: {
-        type: Sequelize.ENUM('category', 'location', 'feature'),
+        type: Sequelize.ENUM('category', 'location', 'feature', 'blog'),
         defaultValue: 'category',
       },
       hasChild: {
