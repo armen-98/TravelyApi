@@ -11,8 +11,8 @@
     "db:undo:last:migration": "npx sequelize-cli db:migrate:undo",
     "db:undo:all": "npx sequelize-cli db:migrate:undo:all",
     "db:undo:one": "npx sequelize-cli db:migrate:undo --name 20250428175311-create-setting.js",
-    "db:create:seed": "npx sequelize-cli seed:generate --name demo-category-images",
-    "db:seed:file": "npx sequelize-cli db:seed --seed 20250515182342-demo-category-images.js",
+    "db:create:seed": "npx sequelize-cli seed:generate --name demo-blog",
+    "db:seed:file": "npx sequelize-cli db:seed --seed 20250518114621-demo-blog.js",
     "db:all:seeds": "npx sequelize-cli db:seed:all",
     "db:run:seed": "npx sequelize-cli db:seed --seed 20250517080228-demo-admin.js",
     "db:undo:seed:all": "npx sequelize-cli db:seed:undo:all",
@@ -22,6 +22,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.803.0",
     "@aws-sdk/s3-request-presigner": "^3.803.0",
+    "@faker-js/faker": "^9.8.0",
     "@hapi/joi": "^17.1.1",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^3.0.2",

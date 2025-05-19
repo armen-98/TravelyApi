@@ -4,7 +4,7 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, Sequelize) => {
   class Category extends Model {
     static associate({ Product, Category, Blog, Widget, Image }) {
-      Category.hasMany(Product, { foreignKey: 'categoryId', as: 'products' });
+      // Category.hasMany(Product, { foreignKey: 'categoryId', as: 'products' });
       Category.hasOne(Image, { foreignKey: 'categoryId', as: 'image' });
       Category.belongsTo(Category, { foreignKey: 'parentId', as: 'parent' });
       Category.hasMany(Category, {
@@ -50,7 +50,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
       },
       type: {
-        type: Sequelize.ENUM('category', 'location', 'feature'),
+        type: Sequelize.ENUM('category', 'location', 'feature', 'blog'),
         defaultValue: 'category',
       },
       hasChild: {
