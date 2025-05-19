@@ -11,12 +11,12 @@
     "db:undo:last:migration": "npx sequelize-cli db:migrate:undo",
     "db:undo:all": "npx sequelize-cli db:migrate:undo:all",
     "db:undo:one": "npx sequelize-cli db:migrate:undo --name 20250428175311-create-setting.js",
-    "db:create:seed": "npx sequelize-cli seed:generate --name demo-blog",
-    "db:seed:file": "npx sequelize-cli db:seed --seed 20250518114621-demo-blog.js",
+    "db:create:seed": "npx sequelize-cli seed:generate --name demo-category-images",
+    "db:seed:file": "npx sequelize-cli db:seed --seed 20250511133327-demo-users.js",
     "db:all:seeds": "npx sequelize-cli db:seed:all",
     "db:run:seed": "npx sequelize-cli db:seed --seed 20250517080228-demo-admin.js",
     "db:undo:seed:all": "npx sequelize-cli db:seed:undo:all",
-    "db:undo:seed:one": "npx sequelize-cli db:seed:undo --seed name-of-seed",
+    "db:undo:seed:one": "npx sequelize-cli db:seed:undo --seed 20250511133327-demo-users.js",
     "db:migrate:generate": "npx sequelize-cli migration:generate --name add-column-to-table"
   },
   "dependencies": {
