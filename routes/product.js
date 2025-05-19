@@ -16,7 +16,7 @@ router.get('/list', getListings);
 router.get('/form', getProductForm);
 
 // Get product details
-router.get('/view/:id', getProduct);
+router.get('/view', getProduct);
 
 // Save product
 router.post('/save', verifyToken, saveProduct);

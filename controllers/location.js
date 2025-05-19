@@ -3,7 +3,6 @@ const { Location } = require('../models');
 // Get locations
 const getLocations = async (req, res) => {
   try {
-    // Get countries
     const countries = await Location.findAll({
       where: { type: 'country' },
       include: [

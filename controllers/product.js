@@ -394,7 +394,7 @@ const getListings = async (req, res) => {
 // Get product details
 const getProduct = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.query;
 
     const product = await Product.findByPk(id, {
       include: [
@@ -524,90 +524,6 @@ const getProduct = async (req, res) => {
       limit: 5,
     });
 
-    // Format social networks
-    const socialNetworks = [
-      {
-        name: 'Facebook',
-        slug: 'facebook',
-        icon: 'facebook',
-        color: '#1877F2',
-        username: product.facebookUsername,
-        url: product.facebookUrl,
-      },
-      {
-        name: 'Twitter (X)',
-        slug: 'twitter',
-        icon: 'twitter',
-        color: '#000000',
-        username: product.twitterUsername,
-        url: product.twitterUrl,
-      },
-      {
-        name: 'Instagram',
-        slug: 'instagram',
-        icon: 'instagram',
-        color: '#E4405F',
-        username: product.instagramUsername,
-        url: product.instagramUrl,
-      },
-      {
-        name: 'Google',
-        slug: 'google',
-        icon: 'google',
-        color: '#4285F4',
-        username: product.googleUsername,
-        url: product.googleUrl,
-      },
-      {
-        name: 'LinkedIn',
-        slug: 'linkedin',
-        icon: 'linkedin',
-        color: '#0A66C2',
-        username: product.linkedinUsername,
-        url: product.linkedinUrl,
-      },
-      {
-        name: 'YouTube',
-        slug: 'youtube',
-        icon: 'youtube',
-        color: '#FF0000',
-        username: product.youtubeUsername,
-        url: product.youtubeUrl,
-      },
-      {
-        name: 'Tumblr',
-        slug: 'tumblr',
-        icon: 'tumblr',
-        color: '#36465D',
-        username: product.tumblrUsername,
-        url: product.tumblrUrl,
-      },
-      {
-        name: 'Flickr',
-        slug: 'flickr',
-        icon: 'flickr',
-        color: '#0063DC',
-        username: product.flickrUsername,
-        url: product.flickrUrl,
-      },
-      {
-        name: 'Pinterest',
-        slug: 'pinterest',
-        icon: 'pinterest',
-        color: '#E60023',
-        username: product.pinterestUsername,
-        url: product.pinterestUrl,
-      },
-      {
-        name: 'Telegram',
-        slug: 'telegram',
-        icon: 'telegram',
-        color: '#26A5E4',
-        username: product.telegramUsername,
-        url: product.telegramUrl,
-      },
-    ].filter((network) => network.username || network.url);
-
     // Format response
     const response = {
       ID: product.id,
@@ -638,7 +554,6 @@ const getProduct = async (req, res) => {
       guid: product.link,
       video_url: product.videoURL,
       social_network: product.socials,
-      social_networks: socialNetworks,
 
       image: product.image
         ? {
