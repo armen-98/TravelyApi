@@ -13,7 +13,9 @@ module.exports = (sequelize, Sequelize) => {
       Wishlist,
       Payment,
       BankAccount,
+      Admin,
     }) {
+      User.hasOne(Admin, { foreignKey: 'userId', as: 'admin' });
       User.hasMany(File, {
         foreignKey: 'FileableId',
         constraints: false,

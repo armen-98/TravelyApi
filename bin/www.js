@@ -84,5 +84,6 @@ const startApp = async () => {
   await startJobs();
   return port;
 };
-
-startApp().then((port) => console.log(`🚀 Server is running on http://localhost:${port}`));
+startApp().then((port) =>
+  console.log(`🚀 Server is running on http://localhost:${port}`),
+);

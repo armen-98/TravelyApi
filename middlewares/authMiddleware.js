@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { User } = require('../models');
+const { User, Role } = require('../models');
 
 const verifyToken = (req, res, next) => {
   let token = req.headers['authorization'];
@@ -14,7 +14,15 @@ const verifyToken = (req, res, next) => {
     if (err) {
       return res.status(401).json({ message: res.__('failed_token') });
     }
-    const user = await User.findByPk(decoded.id);
+    const user = await User.findByPk(decoded.id, {
+      include: [
+        {
+          model: Role,
+          as: 'role',
+          attributes: ['name', 'description'],
+        },
+      ],
+    });
     if (!user) {
       return res.status(401).json({ message: res.__('access_denied') });
     }

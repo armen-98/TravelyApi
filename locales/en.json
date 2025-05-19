@@ -7,6 +7,9 @@
 	"no_token": "No token provided",
 	"invalid_email": "Invalid email format",
 	"invalid_username": "Invalid username",
+	"provide_email_and_password": "Please provide email and password",
+	"invalid_email_or_password": "Invalid email or password",
+	"account_is_inactive": "Your account is inactive. Please contact a super admin.",
 	"exist_email": "Email already exists",
 	"exist_username": "Username already exists",
 	"register_success": "User registered successfully",
@@ -15,6 +18,8 @@
 	"username_invalid_length": "Username must be between 3 and 20 characters",
 	"username_invalid_format": "Username can only contain letters and numbers",
 	"invalid_role": "invalid role",
+	"authentication_required": "Authentication required",
+	"access_denied_admin_privileges_required": "Access denied. Admin privileges required.",
 	"user_not_created": "User not created",
 	"success_message": "Request success",
 	"invalid_otp": "Invalid code, please check again",
@@ -29,5 +34,8 @@
 	"profile_update_success": "Profile updated successfully",
 	"account_deactivated_success": "Account deactivated",
 	"account_deactivated": "Account is deactivated",
-	"contact_us_subject": "Contact Us"
+	"contact_us_subject": "Contact Us",
+	"user_updated_successfully": "User updated successfully",
+	"user_deleted_successfully": "User deleted successfully",
+	"cannot_delete_own_account_through_this_endpoint": "You cannot delete your own account through this endpoint"
 }

@@ -14,7 +14,9 @@
     "db:create:seed": "npx sequelize-cli seed:generate --name demo-category-images",
     "db:seed:file": "npx sequelize-cli db:seed --seed 20250515182342-demo-category-images.js",
     "db:all:seeds": "npx sequelize-cli db:seed:all",
-    "db:run:seed": "npx sequelize-cli db:seed --seed name-of-seeder",
+    "db:run:seed": "npx sequelize-cli db:seed --seed 20250517080228-demo-admin.js",
+    "db:undo:seed:all": "npx sequelize-cli db:seed:undo:all",
+    "db:undo:seed:one": "npx sequelize-cli db:seed:undo --seed name-of-seed",
     "db:migrate:generate": "npx sequelize-cli migration:generate --name add-column-to-table"
   },
   "dependencies": {
