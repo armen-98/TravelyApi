@@ -19,14 +19,6 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
-      phone: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      profileImage: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
       adminId: {
         type: Sequelize.INTEGER,
         allowNull: true,

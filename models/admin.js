@@ -13,14 +13,6 @@ module.exports = (sequelize, Sequelize) => {
   }
   admin.init(
     {
-      phone: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      profileImage: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
       status: {
         type: Sequelize.ENUM('active', 'inactive'),
         defaultValue: 'active',

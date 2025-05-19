@@ -55,7 +55,7 @@ const adminSignIn = async (req, res) => {
         name: user.name,
         email: user.email,
         isSuperAdmin: user.admin?.isSuperAdmin,
-        profileImage: user.admin?.profileImage,
+        image: user.image,
       },
       token,
     });
