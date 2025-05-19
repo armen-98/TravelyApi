@@ -196,4 +196,5 @@ const updateUserProfile = async (req, res) => {
 module.exports = {
   getUser,
   updateUserProfile,
+  uploadMedia,
 };
