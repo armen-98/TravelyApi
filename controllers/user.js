@@ -1,9 +1,10 @@
-const { Customer, File, sequelize } = require('../models');
+const { File, sequelize } = require('../models');
 const { sendErrorEmail } = require('../services/nodemiler');
 const path = require('path');
 const fs = require('fs');
 
 const { User } = require('../models');
+const { updateProfile } = require('../validations/customer');
 
 // Get user profile
 const getUser = async (req, res) => {
@@ -35,57 +36,59 @@ const getUser = async (req, res) => {
   }
 };
 
+// TODO: NEED WE THIS PART ARMEN?
 // Update user profile
-const updateProfile = async (req, res) => {
-  try {
-    const userId = req.user.id; // Assuming user ID is available from auth middleware
-    const { firstName, lastName, description, image } = req.body;
-
-    const user = await User.findByPk(userId);
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found',
-      });
-    }
-
-    // Update user fields
-    if (firstName) user.firstName = firstName;
-    if (lastName) user.lastName = lastName;
-    if (description) user.description = description;
-    if (image) user.image = image;
-
-    // Update name if first or last name changed
-    if (firstName || lastName) {
-      user.name =
-        `${firstName || user.firstName} ${lastName || user.lastName}`.trim();
-    }
-
-    await user.save();
-
-    res.status(200).json({
-      success: true,
-      message: 'Profile updated successfully',
-      data: {
-        id: user.id,
-        name: user.name,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        image: user.image,
-        description: user.description,
-        email: user.email,
-      },
-    });
-  } catch (error) {
-    console.error('Error updating profile:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to update profile',
-      error: error.message,
-    });
-  }
-};
+// const updateProfile = async (req, res) => {
+//   try {
+//     console.log(req.user, 'req.user');
+//     const userId = req.user.id; // Assuming user ID is available from auth middleware
+//     const { firstName, lastName, description, image } = req.body;
+//
+//     const user = await User.findByPk(userId);
+//
+//     if (!user) {
+//       return res.status(404).json({
+//         success: false,
+//         message: 'User not found',
+//       });
+//     }
+//
+//     // Update user fields
+//     if (firstName) user.firstName = firstName;
+//     if (lastName) user.lastName = lastName;
+//     if (description) user.description = description;
+//     if (image) user.image = image;
+//
+//     // Update name if first or last name changed
+//     if (firstName || lastName) {
+//       user.name =
+//         `${firstName || user.firstName} ${lastName || user.lastName}`.trim();
+//     }
+//
+//     await user.save();
+//
+//     res.status(200).json({
+//       success: true,
+//       message: 'Profile updated successfully',
+//       data: {
+//         id: user.id,
+//         name: user.name,
+//         firstName: user.firstName,
+//         lastName: user.lastName,
+//         image: user.image,
+//         description: user.description,
+//         email: user.email,
+//       },
+//     });
+//   } catch (error) {
+//     console.error('Error updating profile:', error);
+//     res.status(500).json({
+//       success: false,
+//       message: 'Failed to update profile',
+//       error: error.message,
+//     });
+//   }
+// };
 
 const uploadMedia = async (req, res) => {
   let transaction;
@@ -126,20 +129,20 @@ const uploadMedia = async (req, res) => {
       {
         name: file.originalname,
         path: filePath,
+        url: filePath,
         FileableId: user.id,
         FileableType: 'avatar',
+        type: 'avatar',
       },
       { transaction },
     );
-    const customer = await Customer.findOne({
-      where: { userId: user.id },
-      transaction,
-    });
-    await customer.update({ image: filePath }, { transaction });
-    await customer.reload({ transaction });
+    await user.update({ image: filePath }, { transaction });
+    await user.reload({ transaction });
+
     await transaction.commit();
+
     return res.status(200).json({
-      data: { ...user.dataValues, ...customer.dataValues },
+      data: user,
       message: res.__('success_message'),
     });
   } catch (e) {
@@ -158,19 +161,19 @@ const updateUserProfile = async (req, res) => {
   try {
     const { error, value } = updateProfile(req.body || {}, res.__);
     transaction = await sequelize.transaction({ autocommit: false });
+
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
 
     const user = await User.findByPk(req.user.id, {
-      include: { model: Customer, as: 'customer' },
       transaction,
     });
     if (!user) {
       return res.status(404).json({ message: res.__('not_found_user') });
     }
 
-    await user.customer.update(value, { transaction });
+    await user.update(value, { transaction });
 
     await transaction.commit();
 
