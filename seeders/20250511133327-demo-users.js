@@ -88,8 +88,6 @@ module.exports = {
     // create admin and connect with admin user
     await queryInterface.bulkInsert('Admins', [
       {
-        phone: '+1234567890',
-        profileImage: null,
         userId: users[0].id,
         status: 'active',
         permissions: JSON.stringify({

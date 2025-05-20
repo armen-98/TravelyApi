@@ -56,6 +56,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         allowNull: true,
       },
+      phone: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       url: {
         type: Sequelize.STRING,
         allowNull: true,
