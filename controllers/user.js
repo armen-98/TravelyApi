@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 
 const { User } = require('../models');
-const { updateProfile } = require('../validations/customer');
+const validators = require('../validations/customer');
 
 // Get user profile
 const getUser = async (req, res) => {
@@ -159,7 +159,7 @@ const uploadMedia = async (req, res) => {
 const updateUserProfile = async (req, res) => {
   let transaction;
   try {
-    const { error, value } = updateProfile(req.body || {}, res.__);
+    const { error, value } = validators.updateProfile(req.body || {}, res.__);
     transaction = await sequelize.transaction({ autocommit: false });
 
     if (error) {
@@ -196,8 +196,38 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
+const updateNotificationSetting = async (req, res) => {
+  try {
+    const { error } = validators.updateNotificationSetting(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
+    const user = await User.findByPk(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: res.__('not_found_user') });
+    }
+
+    await user.update(req.body);
+
+    return res.status(200).json({
+      data: user,
+      message: res.__('notification_update_success'),
+    });
+  } catch (e) {
+    console.log('Catch error for updateNotificationSetting', e);
+    if (process.env.NODE_ENV !== 'development') {
+      sendErrorEmail(e);
+    }
+    return res.status(500).json({
+      message: res.__('internal_error'),
+    });
+  }
+};
+
 module.exports = {
   getUser,
-  updateUserProfile,
   uploadMedia,
+  updateUserProfile,
+  updateNotificationSetting,
 };

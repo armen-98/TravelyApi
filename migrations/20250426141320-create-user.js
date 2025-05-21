@@ -75,10 +75,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      verifiedAt: {
-        type: Sequelize.DATE,
-        allowNull: true,
-      },
       roleId: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -108,16 +104,6 @@ module.exports = {
         type: Sequelize.STRING,
         defaultValue: null,
       },
-      deletedAt: {
-        allowNull: true,
-        type: Sequelize.DATE,
-        defaultValue: null,
-      },
-      deactivatedAt: {
-        allowNull: true,
-        type: Sequelize.DATE,
-        defaultValue: null,
-      },
       isActive: {
         allowNull: true,
         type: Sequelize.BOOLEAN,
@@ -137,6 +123,25 @@ module.exports = {
         allowNull: true,
         type: Sequelize.STRING,
         defaultValue: null,
+      },
+      notificationsEnabled: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+        defaultValue: true,
+      },
+      deletedAt: {
+        allowNull: true,
+        type: Sequelize.DATE,
+        defaultValue: null,
+      },
+      deactivatedAt: {
+        allowNull: true,
+        type: Sequelize.DATE,
+        defaultValue: null,
+      },
+      verifiedAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
       },
       createdAt: {
         allowNull: false,

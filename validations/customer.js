@@ -16,4 +16,12 @@ const updateProfile = (data, translate) => {
   return schema.validate(data);
 };
 
-module.exports = { updateProfile };
+const updateNotificationSetting = (data) => {
+  const schema = Joi.object({
+    notificationsEnabled: Joi.boolean(),
+  });
+
+  return schema.validate(data);
+};
+
+module.exports = { updateProfile, updateNotificationSetting };
