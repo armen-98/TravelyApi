@@ -1,4 +1,4 @@
-const { Category, Image } = require('../models');
+const { Category, Image, Product, User } = require('../models');
 
 // Get categories list
 const getCategories = async (req, res) => {
@@ -104,6 +104,33 @@ const getDiscoveryCategories = async (req, res) => {
           as: 'image',
           required: false,
         },
+        {
+          model: Product,
+          as: 'featuredProducts',
+          required: false,
+          limit: 10,
+          include: [
+            {
+              model: Image,
+              as: 'image',
+            },
+            {
+              model: User,
+              as: 'author',
+              attributes: ['id', 'name', 'image'],
+            },
+            {
+              model: Category,
+              as: 'category',
+              include: [
+                {
+                  model: Image,
+                  as: 'image',
+                },
+              ],
+            },
+          ],
+        },
       ],
       order: [['count', 'DESC']],
       limit: 10,
@@ -126,6 +153,38 @@ const getDiscoveryCategories = async (req, res) => {
       taxonomy: category.type,
       has_child: category.hasChild,
       parent_id: category.parentId,
+      featuredProducts: category.featuredProducts.map((product) => ({
+        ID: product.id,
+        post_title: product.title,
+        post_date: product.createdAt,
+        rating_avg: product.rate,
+        rating_count: product.numRate,
+        wishlist: false,
+        image: product.image
+          ? {
+              id: product.image.id,
+              full: { url: product.image.full },
+              thumb: { url: product.image.thumb },
+            }
+          : undefined,
+        author: product.author
+          ? {
+              id: product.author.id,
+              name: product.author.name,
+              user_photo: product.author.image,
+            }
+          : undefined,
+        category: product.category
+          ? {
+              term_id: product.category.id,
+              name: product.category.title,
+              taxonomy: product.category.type,
+            }
+          : undefined,
+        price_min: product.priceMin,
+        price_max: product.priceMax,
+        address: product.address,
+      })),
     }));
 
     res.status(200).json({

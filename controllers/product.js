@@ -418,10 +418,10 @@ const getProduct = async (req, res) => {
           model: Category,
           as: 'category',
         },
-        {
-          model: Category,
-          as: 'features',
-        },
+        // {
+        //   model: Category,
+        //   as: 'features',
+        // },
         {
           model: Tag,
           as: 'tags',
@@ -592,11 +592,11 @@ const getProduct = async (req, res) => {
           }
         : undefined,
 
-      features: product.features.map((feature) => ({
-        term_id: feature.id,
-        name: feature.title,
-        taxonomy: feature.type,
-      })),
+      // features: product.features.map((feature) => ({
+      //   term_id: feature.id,
+      //   name: feature.title,
+      //   taxonomy: feature.type,
+      // })),
 
       tags: product.tags.map((tag) => ({
         id: tag.id,
