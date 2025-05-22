@@ -11,10 +11,14 @@ module.exports = (sequelize, Sequelize) => {
         foreignKey: 'parentId',
         as: 'subcategories',
       });
-      Category.belongsToMany(Product, {
-        through: 'productFeatures',
+      // Category.belongsToMany(Product, {
+      //   through: 'productFeatures',
+      //   foreignKey: 'categoryId',
+      //   otherKey: 'productId',
+      //   as: 'featuredProducts',
+      // });
+      Category.hasMany(Product, {
         foreignKey: 'categoryId',
-        otherKey: 'productId',
         as: 'featuredProducts',
       });
       Category.belongsToMany(Blog, {

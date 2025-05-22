@@ -16,12 +16,16 @@ module.exports = (sequelize, Sequelize) => {
       Widget,
     }) {
       Product.belongsTo(User, { foreignKey: 'authorId', as: 'author' });
-      Product.belongsTo(Category, { foreignKey: 'categoryId', as: 'category' });
-      Product.belongsToMany(Category, {
-        through: 'productFeatures',
-        foreignKey: 'productId',
-        otherKey: 'categoryId',
-        as: 'features',
+      // Product.belongsTo(Category, { foreignKey: 'categoryId', as: 'category' });
+      // Product.belongsToMany(Category, {
+      //   through: 'productFeatures',
+      //   foreignKey: 'productId',
+      //   otherKey: 'categoryId',
+      //   as: 'features',
+      // });
+      Product.belongsTo(Category, {
+        foreignKey: 'categoryId',
+        as: 'category',
       });
       Product.belongsToMany(Tag, {
         through: 'ProductTags',

@@ -87,6 +87,28 @@ const getHomeInit = async (req, res) => {
       order: [['createdAt', 'DESC']],
     });
 
+    const relatedBlogs = await Blog.findAll({
+      where: {
+        status: 'publish',
+      },
+      include: [
+        {
+          model: Category,
+          as: 'categories',
+        },
+        {
+          model: Image,
+          as: 'image',
+        },
+        {
+          model: User,
+          as: 'author',
+          attributes: ['id', 'name', 'image'],
+        },
+      ],
+      limit: 5,
+    });
+
     // Format response
     const formattedSliders = sliders.map((slider) =>
       slider.image ? slider.image.full : '',
@@ -234,6 +256,69 @@ const getHomeInit = async (req, res) => {
       ],
     });
 
+    const formattedNews = relatedBlogs.map((blog) => ({
+      ID: blog.id,
+      post_title: blog.title,
+      post_date: blog.createdAt,
+      post_status: blog.status,
+      post_content: blog.description,
+      comment_count: blog.numComments,
+      guid: blog.link,
+      image: blog.image
+        ? {
+            id: blog.image.id,
+            full: { url: blog.image.full },
+            thumb: { url: blog.image.thumb },
+          }
+        : undefined,
+      author: blog.author
+        ? {
+            id: blog.author.id,
+            name: blog.author.name,
+            first_name: blog.author.firstName,
+            last_name: blog.author.lastName,
+            user_photo: blog.author.image,
+            description: blog.author.description,
+          }
+        : undefined,
+      categories: blog.categories?.map((category) => ({
+        term_id: category.id,
+        name: category.title,
+        taxonomy: category.type,
+      })),
+      comments: blog.comments?.map((comment) => ({
+        comment_ID: comment.id,
+        comment_author: comment.user.name,
+        comment_author_email: comment.user.email,
+        comment_author_image: comment.user.image,
+        comment_content: comment.content,
+        comment_date: comment.createdAt,
+        user_id: comment.user.id,
+        rate: comment.rate,
+      })),
+      related: relatedBlogs.map((related) => ({
+        ID: related.id,
+        post_title: related.title,
+        post_date: related.createdAt,
+        post_content: related.description?.substring(0, 150) + '...',
+        comment_count: related.numComments,
+        image: related.image
+          ? {
+              id: related.image.id,
+              full: { url: related.image.full },
+              thumb: { url: related.image.thumb },
+            }
+          : undefined,
+        author: related.author
+          ? {
+              id: related.author.id,
+              name: related.author.name,
+              user_photo: related.author.image,
+            }
+          : undefined,
+      })),
+    }));
+
     // Format widgets
     const formattedWidgets = widgets.map((widget) => {
       const baseWidget = {
@@ -365,6 +450,7 @@ const getHomeInit = async (req, res) => {
         locations: formattedLocations,
         recent_posts: formattedRecentPosts,
         widgets: formattedWidgets,
+        news: formattedNews,
       },
     });
   } catch (error) {
