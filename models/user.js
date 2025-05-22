@@ -135,6 +135,11 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         defaultValue: null,
       },
+      notificationsEnabled: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+        defaultValue: true,
+      },
       deletedAt: {
         allowNull: true,
         type: Sequelize.DATE,
