@@ -7,6 +7,6 @@ const router = express.Router();
 router.get('/home', getBlogHome);
 
 // Get blog details
-router.get('/view/:id', getBlogDetail);
+router.get('/view', getBlogDetail);
 
 module.exports = router;

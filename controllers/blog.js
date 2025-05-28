@@ -55,16 +55,86 @@ const getBlogHome = async (req, res) => {
       distinct: true,
     });
 
+    const categories = await Category.findAll({
+      where: { type: 'category', parentId: null },
+      include: [
+        {
+          model: Blog,
+          as: 'blogs',
+        },
+        {
+          model: Image,
+          as: 'image',
+        },
+        {
+          model: Category,
+          as: 'subcategories',
+          include: [
+            {
+              model: Image,
+              as: 'image',
+            },
+          ],
+        },
+      ],
+      limit: 10,
+      order: [['count', 'DESC']],
+    });
+
+    const stickyBlog = await Blog.findOne({
+      where: {
+        status: 'publish',
+      },
+      include: includeConditions,
+    });
+
+    const formattedCategories = categories.map((category) => ({
+      term_id: category.id,
+      name: category.title,
+      count: category.count,
+      image: category.image
+        ? {
+            id: category.image.id,
+            full: { url: category.image.full },
+            thumb: { url: category.image.thumb },
+          }
+        : undefined,
+      icon: category.icon,
+      color: category.color,
+      taxonomy: category.type,
+      has_child:
+        category.hasChild ||
+        (category.subcategories && category.subcategories.length > 0),
+      parent_id: category.parentId,
+      subcategories: category.subcategories?.map((subcat) => ({
+        term_id: subcat.id,
+        name: subcat.title,
+        count: subcat.count,
+        image: subcat.image
+          ? {
+              id: subcat.image.id,
+              full: { url: subcat.image.full },
+              thumb: { url: subcat.image.thumb },
+            }
+          : undefined,
+        icon: subcat.icon,
+        color: subcat.color,
+        taxonomy: subcat.type,
+        has_child: subcat.hasChild,
+        parent_id: subcat.parentId,
+      })),
+    }));
+
     // Format response
     const blogs = rows.map((blog) => ({
       ID: blog.id,
-      post_title: blog.title,
+      title: blog.title,
       post_date: blog.createdAt,
-      post_status: blog.status,
-      post_content: blog.description,
+      status: blog.status,
+      description: blog.description,
       post_excerpt: blog.description?.substring(0, 150) + '...',
-      comment_count: blog.numComments,
-      guid: blog.link,
+      numComments: blog.numComments,
+      link: blog.link,
       image: blog.image
         ? {
             id: blog.image.id,
@@ -91,6 +161,38 @@ const getBlogHome = async (req, res) => {
     res.status(200).json({
       success: true,
       data: blogs,
+      categories: formattedCategories,
+      sticky: {
+        ID: stickyBlog.id,
+        title: stickyBlog.title,
+        post_date: stickyBlog.createdAt,
+        status: stickyBlog.status,
+        description: stickyBlog.description,
+        post_excerpt: stickyBlog.description?.substring(0, 150) + '...',
+        numComments: stickyBlog.numComments,
+        link: stickyBlog.link,
+        image: stickyBlog.image
+          ? {
+              id: stickyBlog.image.id,
+              full: { url: stickyBlog.image.full },
+              thumb: { url: stickyBlog.image.thumb },
+            }
+          : undefined,
+        author: stickyBlog.author
+          ? {
+              id: stickyBlog.author.id,
+              name: stickyBlog.author.name,
+              first_name: stickyBlog.author.firstName,
+              last_name: stickyBlog.author.lastName,
+              user_photo: stickyBlog.author.image,
+            }
+          : undefined,
+        categories: stickyBlog.categories?.map((category) => ({
+          term_id: category.id,
+          name: category.title,
+          taxonomy: category.type,
+        })),
+      },
       pagination: {
         page: Number.parseInt(page),
         per_page: limit,
@@ -111,7 +213,7 @@ const getBlogHome = async (req, res) => {
 // Get blog details
 const getBlogDetail = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.query;
 
     const blog = await Blog.findByPk(id, {
       include: [
@@ -188,12 +290,12 @@ const getBlogDetail = async (req, res) => {
     // Format response
     const response = {
       ID: blog.id,
-      post_title: blog.title,
+      title: blog.title,
       post_date: blog.createdAt,
-      post_status: blog.status,
-      post_content: blog.description,
-      comment_count: blog.numComments,
-      guid: blog.link,
+      status: blog.status,
+      description: blog.description,
+      numComments: blog.numComments,
+      link: blog.link,
       image: blog.image
         ? {
             id: blog.image.id,

@@ -3,7 +3,7 @@ const { Comment, User, Product, Blog } = require('../models');
 // Get comments
 const getComments = async (req, res) => {
   try {
-    const { post_id, type = 'product' } = req.query;
+    const { post_id, type = 'blog' } = req.query;
 
     if (!post_id) {
       return res.status(400).json({
@@ -69,7 +69,7 @@ const getComments = async (req, res) => {
 const saveComment = async (req, res) => {
   try {
     const userId = req.user.id; // Assuming user ID is available from auth middleware
-    const { post_id, content, rate, type = 'product' } = req.body;
+    const { post: post_id, content, rating: rate, type = 'product' } = req.body;
 
     if (!post_id || !content) {
       return res.status(400).json({

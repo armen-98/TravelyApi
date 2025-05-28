@@ -14,6 +14,7 @@ module.exports = (sequelize, Sequelize) => {
       File,
       Comment,
       Widget,
+      Wishlist,
     }) {
       Product.belongsTo(User, { foreignKey: 'authorId', as: 'author' });
       // Product.belongsTo(Category, { foreignKey: 'categoryId', as: 'category' });
@@ -23,6 +24,7 @@ module.exports = (sequelize, Sequelize) => {
       //   otherKey: 'categoryId',
       //   as: 'features',
       // });
+      Product.hasOne(Wishlist, { foreignKey: 'productId', as: 'wishlist' });
       Product.belongsTo(Category, {
         foreignKey: 'categoryId',
         as: 'category',
@@ -34,7 +36,7 @@ module.exports = (sequelize, Sequelize) => {
         as: 'tags',
       });
       Product.belongsToMany(Facility, {
-        through: 'productFacilities',
+        through: 'ProductFacilities',
         foreignKey: 'productId',
         otherKey: 'facilityId',
         as: 'facilities',

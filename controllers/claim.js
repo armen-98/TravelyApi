@@ -3,21 +3,20 @@ const { Claim, Product, User, PaymentMethod } = require('../models');
 // Submit claim
 const submitClaim = async (req, res) => {
   try {
-    const userId = req.user.id; // Assuming user ID is available from auth middleware
+    const userId = req.user.id;
     const {
-      product_id,
-      payment_method,
-      billing_first_name,
-      billing_last_name,
-      billing_phone,
-      billing_email,
-      billing_address_1,
+      id: product_id,
+      first_name: billing_first_name,
+      last_name: billing_last_name,
+      phone: billing_phone,
+      email: billing_email,
+      memo,
     } = req.body;
 
     if (!product_id) {
       return res.status(400).json({
         success: false,
-        message: 'Product ID is required',
+        message: res.__('product_id_required'),
       });
     }
 
@@ -27,15 +26,14 @@ const submitClaim = async (req, res) => {
     if (!product) {
       return res.status(404).json({
         success: false,
-        message: 'Product not found',
+        message: res.__('product_not_found'),
       });
     }
 
-    // Check if product allows claims
     if (!product.useClaim) {
       return res.status(400).json({
         success: false,
-        message: 'This product does not allow claims',
+        message: res.__('product_not_allow_claim'),
       });
     }
 
@@ -50,17 +48,17 @@ const submitClaim = async (req, res) => {
     if (existingClaim) {
       return res.status(400).json({
         success: false,
-        message: 'You already have a claim for this product',
+        message: res.__('has_claim'),
       });
     }
 
     // Get payment method
-    let paymentMethod = null;
-    if (payment_method) {
-      paymentMethod = await PaymentMethod.findOne({
-        where: { methodId: payment_method },
-      });
-    }
+    // let paymentMethod = null;
+    // if (payment_method) {
+    //   paymentMethod = await PaymentMethod.findOne({
+    //     where: { methodId: payment_method },
+    //   });
+    // }
 
     // Create claim
     const claim = await Claim.create({
@@ -72,8 +70,8 @@ const submitClaim = async (req, res) => {
         product.priceDisplay || `${product.priceMin} - ${product.priceMax}`,
       date: new Date(),
       dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
-      paymentName: paymentMethod?.title || 'Cash',
-      payment: payment_method || 'cash',
+      // paymentName: paymentMethod?.title || 'Cash',
+      // payment: payment_method || 'cash',
       total: Number.parseFloat(product.priceMin) || 0,
       currency: 'USD',
       totalDisplay:
@@ -82,7 +80,7 @@ const submitClaim = async (req, res) => {
       billLastName: billing_last_name,
       billPhone: billing_phone,
       billEmail: billing_email,
-      billAddress: billing_address_1,
+      // billAddress: billing_address_1,
       allowCancel: true,
       allowPayment: true,
       allowAccept: false,
@@ -90,7 +88,7 @@ const submitClaim = async (req, res) => {
       createdBy: `${billing_first_name} ${billing_last_name}`,
       userId,
       productId: product_id,
-      paymentMethodId: paymentMethod?.id,
+      // paymentMethodId: paymentMethod?.id,
     });
 
     res.status(200).json({
