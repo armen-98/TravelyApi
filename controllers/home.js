@@ -6,6 +6,7 @@ const {
   Blog,
   Image,
   User,
+  Wishlist,
 } = require('../models');
 
 // Get home initialization data
@@ -66,6 +67,10 @@ const getHomeInit = async (req, res) => {
         {
           model: Image,
           as: 'image',
+        },
+        {
+          model: Wishlist,
+          as: 'wishlist',
         },
         {
           model: User,
@@ -167,12 +172,14 @@ const getHomeInit = async (req, res) => {
     }));
 
     const formattedRecentPosts = recentPosts.map((product) => ({
+      ...product.dataValues,
+      useViewPhone: product.phone,
       ID: product.id,
       post_title: product.title,
       post_date: product.createdAt,
       rating_avg: product.rate,
       rating_count: product.numRate,
-      wishlist: false,
+      wishlist: product.wishlist?.productId === product.id,
       image: product.image
         ? {
             id: product.image.id,
@@ -197,6 +204,8 @@ const getHomeInit = async (req, res) => {
       price_min: product.priceMin,
       price_max: product.priceMax,
       address: product.address,
+      booking_use: product.bookingStyle !== 'no_booking',
+      booking_price_display: `${(+product.priceDisplay || 0).toFixed(2)}$`,
     }));
 
     // Get widgets for additional data

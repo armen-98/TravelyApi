@@ -3,9 +3,11 @@ const { Wishlist, Product, Image, User } = require('../models');
 // Get user's wishlist
 const getWishlist = async (req, res) => {
   try {
-    const userId = req.user.id; // Assuming user ID is available from auth middleware
+    const { page = 1, perPage = 10 } = req.query;
+    const userId = req.user.id;
+    const offset = (page - 1) * +perPage;
 
-    const wishlistItems = await Wishlist.findAll({
+    const wishlistItems = await Wishlist.findAndCountAll({
       where: { userId },
       include: [
         {
@@ -24,35 +26,64 @@ const getWishlist = async (req, res) => {
           ],
         },
       ],
+      limit: +perPage,
+      offset,
     });
-
     // Format response
-    const formattedWishlist = wishlistItems.map((item) => ({
-      ID: item.Product.id,
-      post_title: item.Product.title,
-      post_date: item.Product.createdAt,
-      rating_avg: item.Product.rate,
-      rating_count: item.Product.numRate,
-      wishlist: true,
-      image: item.Product.image
+    const formattedWishlist = wishlistItems.rows.map((item) => ({
+      ...item.dataValues,
+      ...item.product.dataValues,
+      useViewPhone: item.product.phone,
+      ID: item.product.id,
+      post_title: item.product.title,
+      post_date: item.product.createdAt,
+      rating_avg: item.product.rate,
+      rating_count: item.product.numRate,
+      wishlist: item.product.id === item.productId,
+      image: item.product.image
         ? {
-            id: item.Product.image.id,
-            full: { url: item.Product.image.full },
-            thumb: { url: item.Product.image.thumb },
+            id: item.product.image.id,
+            full: { url: item.product.image.full },
+            thumb: { url: item.product.image.thumb },
           }
         : undefined,
-      author: item.Product.author
+      author: item.product.author
         ? {
-            id: item.Product.author.id,
-            name: item.Product.author.name,
-            user_photo: item.Product.author.image,
+            id: item.product.author.id,
+            name: item.product.author.name,
+            user_photo: item.product.author.image,
           }
         : undefined,
+      category: item.product.category
+        ? {
+            term_id: item.product.category.id,
+            name: item.product.category.title,
+            taxonomy: item.product.category.type,
+          }
+        : undefined,
+      price_min: item.product.priceMin,
+      price_max: item.product.priceMax,
+      address: item.product.address,
+      booking_use: item.product.bookingStyle !== 'no_booking',
+      booking_price_display: `${(+item.product.priceDisplay || 0).toFixed(2)}$`,
     }));
 
-    res.status(200).json({
+    const total = wishlistItems.count;
+    const maxPage = Math.ceil(total / perPage);
+    const allowMore = page < maxPage;
+
+    const pagination = {
+      total,
+      page,
+      perPage,
+      allowMore,
+      maxPage,
+    };
+
+    return res.status(200).json({
       success: true,
       data: formattedWishlist,
+      pagination,
     });
   } catch (error) {
     console.error('Error fetching wishlist:', error);
@@ -67,16 +98,16 @@ const getWishlist = async (req, res) => {
 // Add product to wishlist
 const addToWishlist = async (req, res) => {
   try {
-    const userId = req.user.id; // Assuming user ID is available from auth middleware
-    const { product_id } = req.body;
+    const userId = req.user.id;
+    const { post_id } = req.body;
 
     // Check if product exists
-    const product = await Product.findByPk(product_id);
+    const product = await Product.findByPk(post_id);
 
     if (!product) {
       return res.status(404).json({
         success: false,
-        message: 'Product not found',
+        message: res.__('product_not_found'),
       });
     }
 
@@ -84,28 +115,28 @@ const addToWishlist = async (req, res) => {
     const existingWishlist = await Wishlist.findOne({
       where: {
         userId,
-        productId: product_id,
+        productId: post_id,
       },
     });
 
     if (existingWishlist) {
       return res.status(400).json({
         success: false,
-        message: 'Product already in wishlist',
+        message: res.__('already_wishlist'),
       });
     }
 
     // Add to wishlist
     await Wishlist.create({
       userId,
-      productId: product_id,
+      productId: post_id,
     });
 
     res.status(200).json({
       success: true,
-      message: 'Product added to wishlist',
+      message: res.__('product_added_wishlist'),
       data: {
-        product_id,
+        post_id,
       },
     });
   } catch (error) {
@@ -122,28 +153,28 @@ const addToWishlist = async (req, res) => {
 const removeFromWishlist = async (req, res) => {
   try {
     const userId = req.user.id; // Assuming user ID is available from auth middleware
-    const { product_id } = req.body;
+    const { post_id } = req.body;
 
     // Remove from wishlist
     const result = await Wishlist.destroy({
       where: {
         userId,
-        productId: product_id,
+        productId: post_id,
       },
     });
 
     if (result === 0) {
       return res.status(404).json({
         success: false,
-        message: 'Product not found in wishlist',
+        message: res.__('product_not_found'),
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Product removed from wishlist',
+      message: res.__('product_removed'),
       data: {
-        product_id,
+        post_id,
       },
     });
   } catch (error) {
@@ -159,16 +190,15 @@ const removeFromWishlist = async (req, res) => {
 // Clear wishlist
 const clearWishlist = async (req, res) => {
   try {
-    const userId = req.user.id; // Assuming user ID is available from auth middleware
+    const userId = req.user.id;
 
-    // Clear wishlist
     await Wishlist.destroy({
       where: { userId },
     });
 
     res.status(200).json({
       success: true,
-      message: 'Wishlist cleared',
+      message: res.__('wishlist_clear'),
     });
   } catch (error) {
     console.error('Error clearing wishlist:', error);

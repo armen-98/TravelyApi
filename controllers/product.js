@@ -12,6 +12,7 @@ const {
   WorkingSchedule,
   TimeSlot,
   ProductSocialNetwork,
+  Wishlist,
 } = require('../models');
 const { Op } = require('sequelize');
 
@@ -336,7 +337,7 @@ const getListings = async (req, res) => {
       icon: product.icon,
       price_min: product.priceMin,
       price_max: product.priceMax,
-      booking_price_display: product.priceDisplay,
+      booking_price_display: `${(+product.priceDisplay || 0).toFixed(2)}$`,
       booking_style: product.bookingStyle,
       latitude: product.latitude,
       longitude: product.longitude,
@@ -418,10 +419,10 @@ const getProduct = async (req, res) => {
           model: Category,
           as: 'category',
         },
-        // {
-        //   model: Category,
-        //   as: 'features',
-        // },
+        {
+          model: Wishlist,
+          as: 'wishlist',
+        },
         {
           model: Tag,
           as: 'tags',
@@ -430,7 +431,6 @@ const getProduct = async (req, res) => {
         {
           model: Facility,
           as: 'facilities',
-          through: { attributes: ['value'] },
         },
         {
           model: Image,
@@ -498,6 +498,10 @@ const getProduct = async (req, res) => {
           as: 'image',
         },
         {
+          model: Wishlist,
+          as: 'wishlist',
+        },
+        {
           model: User,
           as: 'author',
         },
@@ -517,6 +521,10 @@ const getProduct = async (req, res) => {
           as: 'image',
         },
         {
+          model: Wishlist,
+          as: 'wishlist',
+        },
+        {
           model: User,
           as: 'author',
         },
@@ -533,7 +541,7 @@ const getProduct = async (req, res) => {
       rating_avg: product.rate,
       rating_count: product.numRate,
       post_status: product.status,
-      wishlist: false, // This would be determined by user's wishlist
+      wishlist: product.id === product.wishlist?.productId,
       claim_use: product.useClaim,
       claim_verified: product.claimVerified,
       address: product.address,
@@ -547,7 +555,7 @@ const getProduct = async (req, res) => {
       icon: product.icon,
       price_min: product.priceMin,
       price_max: product.priceMax,
-      booking_price_display: product.priceDisplay,
+      booking_price_display: `${(+product.priceDisplay || 0).toFixed(2)}$`,
       booking_style: product.bookingStyle,
       latitude: product.latitude,
       longitude: product.longitude,
@@ -653,11 +661,14 @@ const getProduct = async (req, res) => {
       },
 
       related: relatedProducts.map((related) => ({
+        ...related.dataValues,
+        useViewPhone: related.phone,
         ID: related.id,
         post_title: related.title,
         post_date: related.createdAt,
         rating_avg: related.rate,
         rating_count: related.numRate,
+        wishlist: related.id === related.wishlist?.productId,
         image: related.image
           ? {
               id: related.image.id,
@@ -672,14 +683,29 @@ const getProduct = async (req, res) => {
               user_photo: related.author.image,
             }
           : undefined,
+        category: related.category
+          ? {
+              term_id: related.category.id,
+              name: related.category.title,
+              taxonomy: related.category.type,
+            }
+          : undefined,
+        price_min: related.priceMin,
+        price_max: related.priceMax,
+        address: related.address,
+        booking_use: related.bookingStyle !== 'no_booking',
+        booking_price_display: `${(+related.priceDisplay || 0).toFixed(2)}$`,
       })),
 
       lastest: latestProducts.map((latest) => ({
+        ...latest.dataValues,
+        useViewPhone: latest.phone,
         ID: latest.id,
         post_title: latest.title,
         post_date: latest.createdAt,
         rating_avg: latest.rate,
         rating_count: latest.numRate,
+        wishlist: latest.id === latest.wishlist?.productId,
         image: latest.image
           ? {
               id: latest.image.id,
@@ -694,6 +720,18 @@ const getProduct = async (req, res) => {
               user_photo: latest.author.image,
             }
           : undefined,
+        category: latest.category
+          ? {
+              term_id: latest.category.id,
+              name: latest.category.title,
+              taxonomy: latest.category.type,
+            }
+          : undefined,
+        price_min: latest.priceMin,
+        price_max: latest.priceMax,
+        address: latest.address,
+        booking_use: latest.bookingStyle !== 'no_booking',
+        booking_price_display: `${(+latest.priceDisplay || 0).toFixed(2)}$`,
       })),
       workingSchedule: product.workingSchedules?.map((day) => ({
         id: day.id,

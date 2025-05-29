@@ -38,5 +38,13 @@
 	"contact_us_subject": "Contact Us",
 	"user_updated_successfully": "User updated successfully",
 	"user_deleted_successfully": "User deleted successfully",
-	"cannot_delete_own_account_through_this_endpoint": "You cannot delete your own account through this endpoint"
+	"cannot_delete_own_account_through_this_endpoint": "You cannot delete your own account through this endpoint",
+	"product_not_found": "Product not found",
+	"already_wishlist": "Product already in wishlist",
+	"product_added_wishlist": "Product added to wishlist",
+	"wishlist_clear": "Wishlist clear",
+	"product_removed": "Product removed from wishlist",
+	"product_id_required": "Product id is required",
+	"product_not_allow_claim": "This product does not allow claims",
+	"has_claim": "You already have a claim for this product"
 }
