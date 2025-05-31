@@ -1,14 +1,21 @@
-const { User, Product, Comment, Image } = require('../models');
+const {
+  User,
+  Product,
+  Comment,
+  Image,
+  Wishlist,
+  Category,
+} = require('../models');
 
 const getAuthorListing = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id: userId } = req.user;
+    const { user_id } = req.query;
     const { page = 1, per_page = 10 } = req.query;
 
     const offset = (page - 1) * per_page;
     const limit = Number.parseInt(per_page);
-
-    const author = await User.findByPk(id);
+    const author = await User.findByPk(user_id || userId);
 
     if (!author) {
       return res.status(404).json({
@@ -18,11 +25,30 @@ const getAuthorListing = async (req, res) => {
     }
 
     const { count, rows } = await Product.findAndCountAll({
-      where: { authorId: id },
+      where: { authorId: author.id },
       include: [
         {
           model: Image,
           as: 'image',
+        },
+        {
+          model: Wishlist,
+          as: 'wishlist',
+        },
+        {
+          model: User,
+          as: 'author',
+          attributes: ['id', 'name', 'image'],
+        },
+        {
+          model: Category,
+          as: 'category',
+          include: [
+            {
+              model: Image,
+              as: 'image',
+            },
+          ],
         },
       ],
       order: [['createdAt', 'DESC']],
@@ -31,12 +57,14 @@ const getAuthorListing = async (req, res) => {
     });
 
     const products = rows.map((product) => ({
+      ...product.dataValues,
+      useViewPhone: product.phone,
       ID: product.id,
       post_title: product.title,
       post_date: product.createdAt,
       rating_avg: product.rate,
       rating_count: product.numRate,
-      wishlist: false,
+      wishlist: product.wishlist?.productId === product.id,
       image: product.image
         ? {
             id: product.image.id,
@@ -44,16 +72,31 @@ const getAuthorListing = async (req, res) => {
             thumb: { url: product.image.thumb },
           }
         : undefined,
-      author: {
-        id: author.id,
-        name: author.name,
-        user_photo: author.image,
-      },
+      author: product.author
+        ? {
+            id: product.author.id,
+            name: product.author.name,
+            user_photo: product.author.image,
+          }
+        : undefined,
+      category: product.category
+        ? {
+            term_id: product.category.id,
+            name: product.category.title,
+            taxonomy: product.category.type,
+          }
+        : undefined,
+      price_min: product.priceMin,
+      price_max: product.priceMax,
+      address: product.address,
+      booking_use: product.bookingStyle !== 'no_booking',
+      booking_price_display: `${(+product.priceDisplay || 0).toFixed(2)}$`,
     }));
 
     res.status(200).json({
       success: true,
       data: products,
+      user: author,
       pagination: {
         page: Number.parseInt(page),
         per_page: limit,
@@ -123,10 +166,18 @@ const getAuthorInfo = async (req, res) => {
 // Get author reviews
 const getAuthorReviews = async (req, res) => {
   try {
-    const { id } = req.params;
+    const {
+      page = 1,
+      per_page = 10,
+      user_id,
+      orderby = 'createdAt',
+      order = 'asc',
+    } = req.query;
 
+    const offset = (page - 1) * per_page;
+    const limit = Number.parseInt(per_page);
     // Check if author exists
-    const author = await User.findByPk(id);
+    const author = await User.findByPk(user_id);
 
     if (!author) {
       return res.status(404).json({
@@ -137,14 +188,14 @@ const getAuthorReviews = async (req, res) => {
 
     // Get author's products
     const products = await Product.findAll({
-      where: { authorId: id },
+      where: { authorId: user_id },
       attributes: ['id'],
     });
 
     const productIds = products.map((product) => product.id);
 
     // Get comments for these products
-    const comments = await Comment.findAll({
+    const comments = await Comment.findAndCountAll({
       where: {
         productId: productIds,
       },
@@ -160,11 +211,13 @@ const getAuthorReviews = async (req, res) => {
           attributes: ['id', 'title'],
         },
       ],
-      order: [['createdAt', 'DESC']],
+      limit,
+      offset,
+      order: [[orderby, order]],
     });
 
     // Format response
-    const formattedComments = comments.map((comment) => ({
+    const formattedComments = comments.rows.map((comment) => ({
       comment_ID: comment.id,
       comment_author: comment.user.name,
       comment_author_email: comment.user.email,
@@ -178,6 +231,12 @@ const getAuthorReviews = async (req, res) => {
 
     res.status(200).json({
       success: true,
+      pagination: {
+        page: Number.parseInt(page),
+        per_page: limit,
+        total: comments.count,
+        max_page: Math.ceil(comments.count / limit),
+      },
       data: formattedComments,
     });
   } catch (error) {

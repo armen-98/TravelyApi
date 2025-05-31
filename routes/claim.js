@@ -18,13 +18,13 @@ router.post('/submit', verifyToken, submitClaim);
 router.get('/list', verifyToken, getClaimList);
 
 // Get claim details
-router.get('/view/:id', verifyToken, getClaimDetail);
+router.get('/view', verifyToken, getClaimDetail);
 
 // Pay claim
 router.post('/pay/:id', verifyToken, payClaim);
 
 // Cancel claim
-router.post('/cancel_by_id/:id', verifyToken, cancelClaim);
+router.post('/cancel_by_id', verifyToken, cancelClaim);
 
 // Accept claim
 router.post('/accept_by_id/:id', verifyToken, acceptClaim);
