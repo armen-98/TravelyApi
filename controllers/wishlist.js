@@ -65,6 +65,7 @@ const getWishlist = async (req, res) => {
       price_max: item.product.priceMax,
       address: item.product.address,
       booking_use: item.product.bookingStyle !== 'no_booking',
+      booking_style: item.product.bookingStyle,
       booking_price_display: `${(+item.product.priceDisplay || 0).toFixed(2)}$`,
     }));
 

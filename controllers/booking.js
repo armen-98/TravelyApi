@@ -33,12 +33,13 @@ const getBookingForm = async (req, res) => {
     let formData = {
       price:
         product.priceDisplay || `${product.priceMin} - ${product.priceMax}`,
+      type: product.bookingStyle,
     };
 
     switch (product.bookingStyle) {
       case 'standard':
         formData = {
-          ...formData,
+          type: product.bookingType,
           start_time: new Date().toISOString(),
           start_date: new Date().toISOString(),
         };
@@ -59,6 +60,7 @@ const getBookingForm = async (req, res) => {
         formData = {
           ...formData,
           start_date: new Date().toISOString(),
+          start_time: new Date().toISOString(),
           select_options: [
             { format: 'Morning', start: '08:00', end: '12:00' },
             { format: 'Afternoon', start: '13:00', end: '17:00' },
@@ -207,10 +209,9 @@ const calculatePrice = async (req, res) => {
 // Create booking order
 const createOrder = async (req, res) => {
   try {
-    const userId = req.user.id; // Assuming user ID is available from auth middleware
+    const userId = req.user.id;
     const {
       product_id,
-      booking_style,
       adult,
       children,
       start_date,
@@ -219,11 +220,11 @@ const createOrder = async (req, res) => {
       end_time,
       table_num,
       payment_method,
-      billing_first_name,
-      billing_last_name,
-      billing_phone,
-      billing_email,
-      billing_address_1,
+      first_name: billing_first_name,
+      last_name: billing_last_name,
+      phone: billing_phone,
+      email: billing_email,
+      address: billing_address_1,
     } = req.body;
 
     if (!product_id) {
@@ -247,7 +248,7 @@ const createOrder = async (req, res) => {
     let price = Number.parseFloat(product.priceMin) || 0;
     let resources = [];
 
-    switch (booking_style) {
+    switch (product.bookingStyle) {
       case 'standard':
         price = price * (adult || 1);
         break;
@@ -331,7 +332,7 @@ const createOrder = async (req, res) => {
       endTime: end_time || null,
       adult: adult || 0,
       children: children || 0,
-      bookingStyle: booking_style,
+      bookingStyle: product.bookingStyle,
       userId,
       productId: product_id,
       paymentMethodId: paymentMethod?.id,
@@ -369,7 +370,7 @@ const createOrder = async (req, res) => {
 // Get booking details
 const getBookingDetail = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.query;
     const userId = req.user.id; // Assuming user ID is available from auth middleware
 
     const booking = await Booking.findByPk(id, {
@@ -386,10 +387,10 @@ const getBookingDetail = async (req, res) => {
           model: User,
           as: 'user',
         },
-        {
-          model: PaymentMethod,
-          as: 'paymentMethod',
-        },
+        // {
+        //   model: PaymentMethod,
+        //   as: 'paymentMethod',
+        // },
       ],
     });
 
@@ -459,9 +460,18 @@ const getBookingDetail = async (req, res) => {
 // Get booking list
 const getBookingList = async (req, res) => {
   try {
-    const userId = req.user.id; // Assuming user ID is available from auth middleware
+    const userId = req.user.id;
+    const {
+      per_page = 10,
+      page = 1,
+      orderby = 'createdAt',
+      order = 'asc',
+    } = req.query;
 
-    const bookings = await Booking.findAll({
+    const offset = (page - 1) * per_page;
+    const limit = Number.parseInt(per_page);
+
+    const bookings = await Booking.findAndCountAll({
       where: { userId },
       include: [
         {
@@ -472,16 +482,18 @@ const getBookingList = async (req, res) => {
           model: Product,
           as: 'product',
         },
-        {
-          model: PaymentMethod,
-          as: 'paymentMethod',
-        },
+        // {
+        //   model: PaymentMethod,
+        //   as: 'paymentMethod',
+        // },
       ],
-      order: [['createdAt', 'DESC']],
+      limit,
+      offset,
+      order: [[orderby, order]],
     });
 
     // Format response
-    const formattedBookings = bookings.map((booking) => ({
+    const formattedBookings = bookings.rows.map((booking) => ({
       booking_id: booking.id,
       title: booking.title,
       date: booking.date,
@@ -517,6 +529,130 @@ const getBookingList = async (req, res) => {
     res.status(200).json({
       success: true,
       data: formattedBookings,
+      statuses: bookings.rows.flatMap((booking) => [
+        {
+          lang_key: `${booking.status} (ASC)`,
+          field: 'status',
+          value: 'asc',
+        },
+        {
+          lang_key: `${booking.status} (DESC)`,
+          field: 'status',
+          value: 'desc',
+        },
+      ]),
+      pagination: {
+        page: Number.parseInt(page),
+        per_page: limit,
+        total: bookings.count,
+        max_page: Math.ceil(bookings.count / limit),
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching booking list:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch booking list',
+      error: error.message,
+    });
+  }
+};
+const getAuthorBookingList = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const {
+      per_page = 10,
+      page = 1,
+      orderby = 'createdAt',
+      order = 'asc',
+    } = req.query;
+
+    const offset = (page - 1) * per_page;
+    const limit = Number.parseInt(per_page);
+
+    const bookings = await Booking.findAndCountAll({
+      where: {
+        userId: {
+          [Op.not]: userId,
+        },
+      },
+      include: [
+        {
+          model: BookingResource,
+          as: 'resources',
+        },
+        {
+          model: Product,
+          as: 'product',
+          where: {
+            authorId: userId,
+          },
+        },
+        // {
+        //   model: PaymentMethod,
+        //   as: 'paymentMethod',
+        // },
+      ],
+      limit,
+      offset,
+      order: [[orderby, order]],
+    });
+
+    // Format response
+    const formattedBookings = bookings.rows.map((booking) => ({
+      booking_id: booking.id,
+      title: booking.title,
+      date: booking.date,
+      status_name: booking.status,
+      status_color: booking.statusColor,
+      payment_name: booking.paymentName,
+      payment: booking.payment,
+      txn_id: booking.transactionID,
+      total: booking.total,
+      currency: booking.currency,
+      total_display: `$${booking.total.toFixed(2)}`,
+      billing_first_name: booking.billFirstName,
+      billing_last_name: booking.billLastName,
+      billing_phone: booking.billPhone,
+      billing_email: booking.billEmail,
+      billing_address_1: booking.billAddress,
+      resources: booking.resources?.map((resource) => ({
+        id: resource.id,
+        name: resource.name,
+        qty: resource.quantity,
+        total: resource.total,
+      })),
+      allow_cancel: booking.allowCancel,
+      allow_payment: booking.allowPayment,
+      allow_accept: booking.allowAccept,
+      created_on: booking.createdAt,
+      paid_date: booking.paidOn,
+      create_via: booking.createdVia,
+      first_name: booking.billFirstName,
+      last_name: booking.billLastName,
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: formattedBookings,
+      statuses: bookings.rows.flatMap((booking) => [
+        {
+          lang_key: `${booking.status} (ASC)`,
+          field: 'status',
+          value: 'asc',
+        },
+        {
+          lang_key: `${booking.status} (DESC)`,
+          field: 'status',
+          value: 'desc',
+        },
+      ]),
+      pagination: {
+        page: Number.parseInt(page),
+        per_page: limit,
+        total: bookings.count,
+        max_page: Math.ceil(bookings.count / limit),
+      },
     });
   } catch (error) {
     console.error('Error fetching booking list:', error);
@@ -620,10 +756,30 @@ const getBookingRequestList = async (req, res) => {
 // Cancel booking
 const cancelBooking = async (req, res) => {
   try {
-    const { id } = req.params;
+    console.log('req.body', req.body);
+    const { id } = req.body;
     const userId = req.user.id; // Assuming user ID is available from auth middleware
 
-    const booking = await Booking.findByPk(id);
+    const booking = await Booking.findByPk(id, {
+      include: [
+        {
+          model: BookingResource,
+          as: 'resources',
+        },
+        {
+          model: Product,
+          as: 'product',
+        },
+        {
+          model: User,
+          as: 'user',
+        },
+        // {
+        //   model: PaymentMethod,
+        //   as: 'paymentMethod',
+        // },
+      ],
+    });
 
     if (!booking) {
       return res.status(404).json({
@@ -655,11 +811,45 @@ const cancelBooking = async (req, res) => {
     booking.allowPayment = false;
     booking.allowAccept = false;
 
+    const response = {
+      booking_id: booking.id,
+      title: booking.title,
+      date: booking.date,
+      status_name: booking.status,
+      status_color: booking.statusColor,
+      payment_name: booking.paymentName,
+      payment: booking.payment,
+      txn_id: booking.transactionID,
+      total: booking.total,
+      currency: booking.currency,
+      total_display: `$${booking.total.toFixed(2)}`,
+      billing_first_name: booking.billFirstName,
+      billing_last_name: booking.billLastName,
+      billing_phone: booking.billPhone,
+      billing_email: booking.billEmail,
+      billing_address_1: booking.billAddress,
+      resources: booking.resources?.map((resource) => ({
+        id: resource.id,
+        name: resource.name,
+        qty: resource.quantity,
+        total: resource.total,
+      })),
+      allow_cancel: booking.allowCancel,
+      allow_payment: booking.allowPayment,
+      allow_accept: booking.allowAccept,
+      created_on: booking.createdAt,
+      paid_date: booking.paidOn,
+      create_via: booking.createdVia,
+      first_name: booking.user.firstName,
+      last_name: booking.user.lastName,
+    };
+
     await booking.save();
 
     res.status(200).json({
       success: true,
       message: 'Booking cancelled successfully',
+      data: response,
     });
   } catch (error) {
     console.error('Error cancelling booking:', error);
@@ -739,4 +929,5 @@ module.exports = {
   getBookingRequestList,
   cancelBooking,
   acceptBooking,
+  getAuthorBookingList,
 };

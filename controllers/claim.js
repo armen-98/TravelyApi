@@ -112,24 +112,34 @@ const submitClaim = async (req, res) => {
 const getClaimList = async (req, res) => {
   try {
     const userId = req.user.id; // Assuming user ID is available from auth middleware
+    const {
+      per_page = 10,
+      page = 1,
+      orderby = 'createdAt',
+      order = 'asc',
+    } = req.query;
 
-    const claims = await Claim.findAll({
+    const offset = (page - 1) * per_page;
+    const limit = Number.parseInt(per_page);
+    const claims = await Claim.findAndCountAll({
       where: { userId },
       include: [
         {
           model: Product,
           as: 'product',
         },
-        {
-          model: PaymentMethod,
-          as: 'paymentMethod',
-        },
+        // {
+        //   model: PaymentMethod,
+        //   as: 'paymentMethod',
+        // },
       ],
-      order: [['createdAt', 'DESC']],
+      limit,
+      offset,
+      order: [[orderby, order]],
     });
 
     // Format response
-    const formattedClaims = claims.map((claim) => ({
+    const formattedClaims = claims.rows.map((claim) => ({
       claim_id: claim.id,
       title: claim.title,
       status_name: claim.status,
@@ -161,6 +171,24 @@ const getClaimList = async (req, res) => {
     res.status(200).json({
       success: true,
       data: formattedClaims,
+      statuses: claims.rows.flatMap((claim) => [
+        {
+          lang_key: `${claim.status} (ASC)`,
+          field: 'status',
+          value: 'asc',
+        },
+        {
+          lang_key: `${claim.status} (DESC)`,
+          field: 'status',
+          value: 'desc',
+        },
+      ]),
+      pagination: {
+        page: Number.parseInt(page),
+        per_page: limit,
+        total: claims.count,
+        max_page: Math.ceil(claims.count / limit),
+      },
     });
   } catch (error) {
     console.error('Error fetching claim list:', error);
@@ -175,7 +203,7 @@ const getClaimList = async (req, res) => {
 // Get claim details
 const getClaimDetail = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.query;
     const userId = req.user.id; // Assuming user ID is available from auth middleware
 
     const claim = await Claim.findByPk(id, {
@@ -188,10 +216,10 @@ const getClaimDetail = async (req, res) => {
           model: User,
           as: 'user',
         },
-        {
-          model: PaymentMethod,
-          as: 'paymentMethod',
-        },
+        // {
+        //   model: PaymentMethod,
+        //   as: 'paymentMethod',
+        // },
       ],
     });
 
@@ -311,10 +339,25 @@ const payClaim = async (req, res) => {
 // Cancel claim
 const cancelClaim = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.body;
     const userId = req.user.id; // Assuming user ID is available from auth middleware
 
-    const claim = await Claim.findByPk(id);
+    const claim = await Claim.findByPk(id, {
+      include: [
+        {
+          model: Product,
+          as: 'product',
+        },
+        {
+          model: User,
+          as: 'user',
+        },
+        // {
+        //   model: PaymentMethod,
+        //   as: 'paymentMethod',
+        // },
+      ],
+    });
 
     if (!claim) {
       return res.status(404).json({
@@ -346,11 +389,41 @@ const cancelClaim = async (req, res) => {
     claim.allowPayment = false;
     claim.allowAccept = false;
 
+    const response = {
+      claim_id: claim.id,
+      title: claim.title,
+      status_name: claim.status,
+      address: claim.address,
+      status_color: claim.statusColor,
+      total_display: claim.totalDisplay,
+      date: claim.date,
+      due_date: claim.dueDate,
+      payment_name: claim.paymentName,
+      payment: claim.payment,
+      txn_id: claim.transactionID,
+      total: claim.total,
+      currency: claim.currency,
+      billing_first_name: claim.billFirstName,
+      billing_last_name: claim.billLastName,
+      billing_phone: claim.billPhone,
+      billing_email: claim.billEmail,
+      billing_address_1: claim.billAddress,
+      allow_cancel: claim.allowCancel,
+      allow_payment: claim.allowPayment,
+      allow_accept: claim.allowAccept,
+      created_on: claim.createdAt,
+      paid_date: claim.paidOn,
+      create_via: claim.createdVia,
+      first_name: claim.user.firstName,
+      last_name: claim.user.lastName,
+    };
+
     await claim.save();
 
     res.status(200).json({
       success: true,
       message: 'Claim cancelled successfully',
+      data: response,
     });
   } catch (error) {
     console.error('Error cancelling claim:', error);
