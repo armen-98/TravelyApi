@@ -1,6 +1,7 @@
 const { Op } = require('sequelize');
 const { User, Role } = require('../../models');
 const { sendErrorEmail } = require('../../services/nodemiler');
+const { roles } = require('../../constants');
 
 // Get all users (admin only)
 const getUsers = async (req, res) => {
@@ -17,6 +18,13 @@ const getUsers = async (req, res) => {
 
     // Build query
     const where = {};
+
+    let filterByRole = roles.USER;
+    if (req.user.role.name === roles.SUPER_ADMIN) {
+      filterByRole = roles.ADMIN;
+    } else if (req.user.role.name === roles.ADMIN) {
+      filterByRole = roles.MODERATOR;
+    }
 
     // Search by name or email
     if (search) {
@@ -42,6 +50,7 @@ const getUsers = async (req, res) => {
         {
           model: Role,
           as: 'role',
+          where: { name: filterByRole },
           attributes: ['name', 'description'],
         },
       ],
