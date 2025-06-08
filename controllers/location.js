@@ -3,8 +3,22 @@ const { Location } = require('../models');
 // Get locations
 const getLocations = async (req, res) => {
   try {
+    const { parent_id, type = 'country' } = req.query;
+    const where = {
+      type:
+        type === 'location'
+          ? 'state'
+          : type === 'category'
+            ? 'city'
+            : 'category',
+    };
+
+    if (parent_id) {
+      where.parentId = parent_id;
+    }
+
     const countries = await Location.findAll({
-      where: { type: 'country' },
+      where,
       include: [
         {
           model: Location,

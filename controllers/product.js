@@ -15,6 +15,8 @@ const {
   Wishlist,
 } = require('../models');
 const { Op } = require('sequelize');
+const path = require('path');
+const fs = require('fs');
 
 const getProductForm = async (req, res) => {
   try {
@@ -338,7 +340,7 @@ const getListings = async (req, res) => {
       price_min: product.priceMin,
       price_max: product.priceMax,
       booking_price_display: `${(+product.priceDisplay || 0).toFixed(2)}$`,
-      booking_style: product.bookingStyle,
+      booking_style: product.booking_style,
       latitude: product.latitude,
       longitude: product.longitude,
       guid: product.link,
@@ -600,11 +602,11 @@ const getProduct = async (req, res) => {
           }
         : undefined,
 
-      // features: product.features.map((feature) => ({
-      //   term_id: feature.id,
-      //   name: feature.title,
-      //   taxonomy: feature.type,
-      // })),
+      features: product.facilities.map((feature) => ({
+        term_id: feature.id,
+        name: feature.name,
+        taxonomy: feature.type,
+      })),
 
       tags: product.tags.map((tag) => ({
         id: tag.id,
@@ -768,7 +770,6 @@ const saveProduct = async (req, res) => {
   try {
     const userId = req.user.id; // Assuming user ID is available from auth middleware
     const productData = req.body;
-
     // Check if updating existing product
     let product;
     if (productData.id) {
@@ -788,13 +789,12 @@ const saveProduct = async (req, res) => {
           message: 'You are not authorized to update this product',
         });
       }
-
       // Update product fields
       await product.update({
         title: productData.title,
-        description: productData.description,
+        description: productData.content,
         address: productData.address,
-        zipCode: productData.zipCode,
+        zipCode: productData.zip_code,
         phone: productData.phone,
         fax: productData.fax,
         email: productData.email,
@@ -804,40 +804,27 @@ const saveProduct = async (req, res) => {
         priceMax: productData.price_max,
         latitude: productData.latitude,
         longitude: productData.longitude,
-        categoryId: productData.category_id,
-        countryId: productData.country_id,
-        stateId: productData.state_id,
-        cityId: productData.city_id,
+        categoryId: productData.categories[0].id,
+        countryId: productData.country,
+        stateId: productData.state,
+        cityId: productData.city,
         socials: productData.social_network || {},
         // Social network fields
-        facebookUsername: productData.facebook_username,
-        facebookUrl: productData.facebook_url,
-        twitterUsername: productData.twitter_username,
-        twitterUrl: productData.twitter_url,
-        instagramUsername: productData.instagram_username,
-        instagramUrl: productData.instagram_url,
-        googleUsername: productData.google_username,
-        googleUrl: productData.google_url,
-        linkedinUsername: productData.linkedin_username,
-        linkedinUrl: productData.linkedin_url,
-        youtubeUsername: productData.youtube_username,
-        youtubeUrl: productData.youtube_url,
-        tumblrUsername: productData.tumblr_username,
-        tumblrUrl: productData.tumblr_url,
-        flickrUsername: productData.flickr_username,
-        flickrUrl: productData.flickr_url,
-        pinterestUsername: productData.pinterest_username,
-        pinterestUrl: productData.pinterest_url,
-        telegramUsername: productData.telegram_username,
-        telegramUrl: productData.telegram_url,
+        dateEstablish: productData.date_establish,
+        status: productData.status,
+        color: productData.color,
+        icon: productData.icon,
+        priceDisplay: productData.bookin_price,
+        bookingStyle: productData.booking_style,
+        authorId: userId,
       });
     } else {
       // Create new product
       product = await Product.create({
         title: productData.title,
-        description: productData.description,
+        description: productData.content,
         address: productData.address,
-        zipCode: productData.zipCode,
+        zipCode: productData.zip_code,
         phone: productData.phone,
         fax: productData.fax,
         email: productData.email,
@@ -847,113 +834,86 @@ const saveProduct = async (req, res) => {
         priceMax: productData.price_max,
         latitude: productData.latitude,
         longitude: productData.longitude,
-        categoryId: productData.category_id,
-        countryId: productData.country_id,
-        stateId: productData.state_id,
-        cityId: productData.city_id,
-        authorId: userId,
+        categoryId: productData.categories[0].id,
+        countryId: productData.country,
+        stateId: productData.state,
+        cityId: productData.city,
         socials: productData.social_network || {},
         // Social network fields
-        facebookUsername: productData.facebook_username,
-        facebookUrl: productData.facebook_url,
-        twitterUsername: productData.twitter_username,
-        twitterUrl: productData.twitter_url,
-        instagramUsername: productData.instagram_username,
-        instagramUrl: productData.instagram_url,
-        googleUsername: productData.google_username,
-        googleUrl: productData.google_url,
-        linkedinUsername: productData.linkedin_username,
-        linkedinUrl: productData.linkedin_url,
-        youtubeUsername: productData.youtube_username,
-        youtubeUrl: productData.youtube_url,
-        tumblrUsername: productData.tumblr_username,
-        tumblrUrl: productData.tumblr_url,
-        flickrUsername: productData.flickr_username,
-        flickrUrl: productData.flickr_url,
-        pinterestUsername: productData.pinterest_username,
-        pinterestUrl: productData.pinterest_url,
-        telegramUsername: productData.telegram_username,
-        telegramUrl: productData.telegram_url,
+        dateEstablish: productData.date_establish,
+        status: productData.status,
+        color: productData.color,
+        icon: productData.icon,
+        priceDisplay: productData.bookin_price,
+        bookingStyle: productData.booking_style,
+        authorId: userId,
       });
     }
 
-    // Handle image
-    if (productData.image_id) {
+    const freshProduct = await Product.findOne({
+      where: {
+        id: product.id,
+      },
+      include: [{ model: Facility, as: 'facilities' }],
+    });
+
+    if (productData.thumbnail) {
       await Image.update(
         { productId: product.id },
-        { where: { id: productData.image_id } },
+        { where: { id: productData.thumbnail } },
+      );
+      await product.update({
+        imageId: productData.thumbnail,
+      });
+    }
+    if (productData.gallery) {
+      const galleryIds = productData.gallery.split(',');
+
+      await Image.update(
+        { productId: product.id },
+        { where: { id: galleryIds } },
       );
     }
 
     // Handle features
-    if (productData.features && Array.isArray(productData.features)) {
-      // Remove existing features
-      await product.setFeatures([]);
-
-      // Add new features
-      await product.addFeatures(productData.features);
+    if (productData?.features?.length) {
+      const featureIds = productData?.features
+        .filter(
+          (fac) => !productData.categories.map((c) => c.id).includes(fac.id),
+        )
+        .map((feature) => feature.id);
+      const existingFacilities = await Facility.findAll({
+        where: { id: featureIds },
+      });
+      const existingFacilityIds = existingFacilities.map((f) => f.id);
+      await freshProduct.setFacilities([]);
+      await freshProduct.setFacilities(existingFacilityIds);
     }
 
     // Handle tags
-    if (productData.tags && Array.isArray(productData.tags)) {
-      // Remove existing tags
+    if (productData.tags_input?.length) {
+      const tags = await Tag.findAll({
+        where: {
+          name: productData.tags_input,
+        },
+      });
+      const tagIds = tags.map((tag) => tag.id);
       await product.setTags([]);
 
       // Add new tags
-      await product.addTags(productData.tags);
+      await product.addTags(tagIds);
     }
 
-    // Handle facilities
-    if (productData.facilities && Array.isArray(productData.facilities)) {
-      // Remove existing facilities
-      await product.setFacilities([]);
-
-      // Add new facilities
-      for (const facility of productData.facilities) {
-        await product.addFacility(facility.id, {
-          through: { value: facility.value || null },
-        });
-      }
-    }
-
-    // Handle social networks
-    if (
-      productData.social_networks &&
-      Array.isArray(productData.social_networks)
-    ) {
-      // Remove existing social networks
-      await ProductSocialNetwork.destroy({
-        where: { productId: product.id },
-      });
-
-      // Add new social networks
-      const socialNetworkRecords = productData.social_networks.map(
-        (network) => ({
-          productId: product.id,
-          socialNetworkId: network.id,
-          username: network.username,
-          url: network.url,
-          displayOrder: network.displayOrder || 0,
-        }),
-      );
-
-      await ProductSocialNetwork.bulkCreate(socialNetworkRecords);
-    }
-
-    // Handle opening hours
-    if (productData.opening_hour && Array.isArray(productData.opening_hour)) {
-      // Remove existing opening hours
+    if (productData.opening_hours?.length) {
       await OpenTime.destroy({ where: { productId: product.id } });
 
-      // Add new opening hours
-      for (const openTime of productData.opening_hour) {
+      for (const openTime of productData.opening_hours) {
         const newOpenTime = await OpenTime.create({
           dayOfWeek: openTime.dayOfWeek,
           key: openTime.key,
           productId: product.id,
         });
 
-        // Add schedules
         if (openTime.schedule && Array.isArray(openTime.schedule)) {
           for (const schedule of openTime.schedule) {
             await Schedule.create({
@@ -961,38 +921,6 @@ const saveProduct = async (req, res) => {
               start: schedule.start,
               end: schedule.end,
               openTimeId: newOpenTime.id,
-            });
-          }
-        }
-      }
-    }
-
-    // Handle working schedules
-    if (
-      productData.working_schedule &&
-      Array.isArray(productData.working_schedule)
-    ) {
-      // Remove existing working schedules
-      await WorkingSchedule.destroy({ where: { productId: product.id } });
-
-      // Add new working schedules
-      for (const day of productData.working_schedule) {
-        const schedule = await WorkingSchedule.create({
-          productId: product.id,
-          dayOfWeek: day.dayOfWeek,
-          isOpen: day.isOpen,
-          openAllDay: day.openAllDay,
-          isClosed: day.isClosed,
-        });
-
-        // Add time slots
-        if (day.timeSlots && Array.isArray(day.timeSlots)) {
-          for (const slot of day.timeSlots) {
-            await TimeSlot.create({
-              scheduleId: schedule.id,
-              startTime: slot.startTime,
-              endTime: slot.endTime,
-              label: slot.label,
             });
           }
         }
@@ -1071,10 +999,80 @@ function getDayName(dayOfWeek) {
   return days[dayOfWeek];
 }
 
+const uploadMedia = async (req, res) => {
+  try {
+    if (!req.files?.length) {
+      return res.status(400).json({
+        success: false,
+        message: 'No file uploaded',
+      });
+    }
+
+    const file = req.files[0];
+    const ext = path.extname(file.originalname).toLowerCase();
+
+    const filename = `${Date.now()}${ext}`;
+
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    const filePath = path.join(uploadDir, filename);
+    fs.writeFileSync(filePath, file.buffer);
+
+    const baseUrl = `${req.protocol}://${process.env.API_URL}/uploads`;
+    const fileUrl = `${baseUrl}/${filename}`;
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+
+    if (imageExtensions.includes(ext)) {
+      const image = await Image.create({
+        full: fileUrl,
+        thumb: fileUrl,
+      });
+
+      res.status(200).json({
+        success: true,
+        data: {
+          id: image.id,
+          image: fileUrl,
+          full: { url: fileUrl },
+          thumb: { url: fileUrl },
+        },
+      });
+    } else {
+      const fileRecord = await File.create({
+        name: path.basename(file.originalname, ext),
+        type: ext.substring(1),
+        url: fileUrl,
+        size: `${Math.round(file.size / 1024)} KB`,
+      });
+
+      res.status(200).json({
+        success: true,
+        data: {
+          id: fileRecord.id,
+          name: `${fileRecord.name}.${fileRecord.type}`,
+          url: fileRecord.url,
+          size: fileRecord.size,
+        },
+      });
+    }
+  } catch (error) {
+    console.error('Error uploading media:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to upload media',
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   getListings,
   getProduct,
   saveProduct,
   deleteProduct,
   getProductForm,
+  uploadMedia,
 };
