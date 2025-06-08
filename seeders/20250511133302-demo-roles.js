@@ -1,9 +1,11 @@
+const { roles } = require('../constants');
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.bulkInsert('Roles', [
       {
-        name: 'admin',
-        description: 'Administrator with full access to all features',
+        name: roles.SUPER_ADMIN,
+        description: 'Super Administrator with full access to all features',
         permissions: JSON.stringify({
           users: { read: true, create: true, update: true, delete: true },
           products: { read: true, create: true, update: true, delete: true },
@@ -18,7 +20,39 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-        name: 'business',
+        name: roles.ADMIN,
+        description: 'Administrator with not full access to features',
+        permissions: JSON.stringify({
+          users: { read: true, create: true, update: true, delete: true },
+          products: { read: true, create: true, update: true, delete: true },
+          categories: { read: true, create: true, update: true, delete: true },
+          blogs: { read: true, create: true, update: true, delete: true },
+          comments: { read: true, create: true, update: true, delete: true },
+          bookings: { read: true, create: true, update: true, delete: true },
+          claims: { read: true, create: true, update: true, delete: true },
+          settings: { read: true, update: true },
+        }),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: roles.MODERATOR,
+        description: 'Moderator partly access to features',
+        permissions: JSON.stringify({
+          users: { read: true, create: true, update: true, delete: true },
+          products: { read: true, create: true, update: true, delete: true },
+          categories: { read: true, create: true, update: true, delete: true },
+          blogs: { read: true, create: true, update: true, delete: true },
+          comments: { read: true, create: true, update: true, delete: true },
+          bookings: { read: true, create: true, update: true, delete: true },
+          claims: { read: true, create: true, update: true, delete: true },
+          settings: { read: true, update: true },
+        }),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: roles.BUSINESS,
         description: 'Business owner who can manage their own listings',
         permissions: JSON.stringify({
           users: { read: true, create: false, update: false, delete: false },
@@ -69,7 +103,7 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
-        name: 'user',
+        name: roles.USER,
         description: 'Regular user with basic permissions',
         permissions: JSON.stringify({
           users: {
