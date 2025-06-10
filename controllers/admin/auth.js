@@ -23,6 +23,11 @@ const adminSignIn = async (req, res) => {
           model: Admin,
           as: 'admin',
         },
+        {
+          model: Role,
+          as: 'role',
+          attributes: ['name', 'description'],
+        },
       ],
     });
 
@@ -57,11 +62,38 @@ const adminSignIn = async (req, res) => {
         email: user.email,
         isSuperAdmin: user.admin?.isSuperAdmin,
         image: user.image,
+        role: user.role.name,
       },
       token,
     });
   } catch (e) {
     console.log('Catch error for admin signIn', e);
+    if (process.env.NODE_ENV !== 'development') {
+      await sendErrorEmail(e);
+    }
+    return res.status(500).json({
+      message: res.__('internal_error'),
+    });
+  }
+};
+
+const me = async (req, res) => {
+  try {
+    const { user } = req;
+
+    res.status(200).json({
+      success: true,
+      data: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        isSuperAdmin: user.admin?.isSuperAdmin,
+        image: user.image,
+        role: user.role.name,
+      },
+    });
+  } catch (e) {
+    console.log('Catch error for admin me', e);
     if (process.env.NODE_ENV !== 'development') {
       await sendErrorEmail(e);
     }
@@ -141,5 +173,6 @@ const enterAccount = async (req, res) => {
 
 module.exports = {
   adminSignIn,
+  me,
   enterAccount,
 };
