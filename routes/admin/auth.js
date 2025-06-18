@@ -1,13 +1,9 @@
 const express = require('express');
 
-const {
-  adminSignIn,
-  enterAccount,
-  me,
-} = require('../../controllers/admin/auth');
+const { adminSignIn, enterAccount } = require('../../controllers/admin/auth');
 const allowAdminRoles = require('../../middlewares/allowAdminRoles');
 
-const { roles, PERMISSION_ALL } = require('../../constants');
+const { roles } = require('../../constants');
 const { verifyToken } = require('../../middlewares/authMiddleware');
 
 const router = express.Router();
@@ -16,7 +12,6 @@ const router = express.Router();
 router.post('/sign-in', adminSignIn);
 
 // Privet routes
-router.get('/me', verifyToken, allowAdminRoles(PERMISSION_ALL), me);
 router.post(
   '/enter-account/:id',
   verifyToken,
