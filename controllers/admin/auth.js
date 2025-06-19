@@ -23,6 +23,11 @@ const adminSignIn = async (req, res) => {
           model: Admin,
           as: 'admin',
         },
+        {
+          model: Role,
+          as: 'role',
+          attributes: ['name', 'description'],
+        },
       ],
     });
 
@@ -57,6 +62,7 @@ const adminSignIn = async (req, res) => {
         email: user.email,
         isSuperAdmin: user.admin?.isSuperAdmin,
         image: user.image,
+        role: user.role.name,
       },
       token,
     });

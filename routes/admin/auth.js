@@ -10,6 +10,8 @@ const router = express.Router();
 
 // Public routes
 router.post('/sign-in', adminSignIn);
+
+// Privet routes
 router.post(
   '/enter-account/:id',
   verifyToken,
