@@ -12,7 +12,6 @@ const {
 // Get home initialization data
 const getHomeInit = async (req, res) => {
   try {
-    // Get sliders (banners)
     const sliders = await Banner.findAll({
       where: { type: 'slider' },
       include: [
@@ -88,6 +87,7 @@ const getHomeInit = async (req, res) => {
           ],
         },
       ],
+      distinct: true,
       limit: 10,
       order: [['createdAt', 'DESC']],
     });
@@ -170,6 +170,7 @@ const getHomeInit = async (req, res) => {
       taxonomy: location.type,
       has_child: false,
     }));
+    console.log('recentPosts', recentPosts);
 
     const formattedRecentPosts = recentPosts.map((product) => ({
       ...product.dataValues,

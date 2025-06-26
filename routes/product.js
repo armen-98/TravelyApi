@@ -6,7 +6,9 @@ const {
   saveProduct,
   deleteProduct,
   getProductForm,
+  uploadMedia,
 } = require('../controllers/product.js');
+const multerMiddleware = require('../middlewares/multer');
 
 const router = express.Router();
 
@@ -23,5 +25,6 @@ router.post('/save', verifyToken, saveProduct);
 
 // Delete product
 router.delete('/delete/:id', verifyToken, deleteProduct);
+router.post('/image', [verifyToken, multerMiddleware], uploadMedia);
 
 module.exports = router;

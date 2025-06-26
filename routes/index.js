@@ -45,6 +45,4 @@ router.use('/tags', tagsRouter);
 router.use('/upload', uploadRouter);
 router.use('/wishlist', wishlistRouter);
 
-// Contact us
-
 module.exports = router;

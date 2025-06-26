@@ -39,8 +39,13 @@ const changeLanguage = async (req, res) => {
 };
 const getSettings = async (req, res) => {
   try {
+    const where = {};
+
+    if (req.headers?.deviceid) {
+      where.deviceId = req.headers?.deviceid;
+    }
     const settings = await Setting.findOne({
-      where: { deviceId: req.headers.deviceid },
+      where,
       order: [['createdAt', 'DESC']],
     });
 
