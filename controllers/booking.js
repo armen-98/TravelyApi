@@ -756,7 +756,6 @@ const getBookingRequestList = async (req, res) => {
 // Cancel booking
 const cancelBooking = async (req, res) => {
   try {
-    console.log('req.body', req.body);
     const { id } = req.body;
     const userId = req.user.id; // Assuming user ID is available from auth middleware
 

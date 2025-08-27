@@ -120,14 +120,12 @@ const signUp = async (req, res) => {
 
 const signIn = async (req, res) => {
   try {
-    const { username, password } = req.body;
-    const usernameError = validateUsername(username);
-    if (usernameError) {
-      return res.status(400).json({ message: res.__(usernameError) });
+    const { email, password } = req.body;
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ message: res.__('invalid_email') });
     }
-
     const user = await User.findOne({
-      where: { username },
+      where: { email },
     });
     if (!user) {
       return res.status(404).json({ message: res.__('not_found_user') });
@@ -294,9 +292,9 @@ const forgotPassword = async (req, res) => {
 const verifyOtp = async (req, res) => {
   let transaction;
   try {
-    const { username, email, code } = req.body;
+    const { email, code } = req.body;
 
-    if (!username && !email) {
+    if (!email) {
       return res
         .status(400)
         .json({ message: res.__('username_or_email_required') });
@@ -304,12 +302,7 @@ const verifyOtp = async (req, res) => {
 
     transaction = await sequelize.transaction({ autocommit: false });
 
-    let user;
-    if (username) {
-      user = await User.findOne({ where: { username }, transaction });
-    } else if (email) {
-      user = await User.findOne({ where: { email }, transaction });
-    }
+    const user = await User.findOne({ where: { email }, transaction });
 
     if (!user) {
       await transaction.rollback();

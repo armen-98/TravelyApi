@@ -16,7 +16,6 @@ const removeAttachmentFiles = async () => {
         fs.rmdirSync(path.join(filesPath, file), { recursive: true });
       }
     }
-    console.log('files', files);
   } catch (e) {
     console.log('Catch error for removeAttachmentFiles', e);
   }
