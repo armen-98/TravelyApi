@@ -4,7 +4,13 @@ const { Op } = require('sequelize');
 // Get blog home data
 const getBlogHome = async (req, res) => {
   try {
-    const { page = 1, per_page = 10, s: keyword, category_id } = req.query;
+    const {
+      page = 1,
+      per_page = 10,
+      s: keyword,
+      category_id,
+      sort,
+    } = req.query;
 
     const offset = (page - 1) * per_page;
     const limit = Number.parseInt(per_page);
@@ -15,7 +21,10 @@ const getBlogHome = async (req, res) => {
     };
 
     if (keyword) {
-      whereConditions.title = { [Op.like]: `%${keyword}%` };
+      whereConditions[Op.or] = [
+        { title: { [Op.like]: `%${keyword}%` } },
+        { description: { [Op.like]: `%${keyword}%` } },
+      ];
     }
 
     // Build include conditions
