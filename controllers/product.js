@@ -209,26 +209,35 @@ const getProductForm = async (req, res) => {
   }
 };
 
+const sortByValues = {
+  'Latest Post': [['createdAt', 'DESC']],
+  Rating: [['rate', 'DESC']],
+  Distance: [['rate', 'DESC']],
+  'Price: Low to High': [['priceMin', 'ASC']],
+  'Price: High to Low': [['priceMax', 'DESC']],
+};
+
 // Get product listings
 const getListings = async (req, res) => {
   try {
     const {
+      s: keyword,
+      country,
+      state,
+      city,
+      rating,
+      priceMin,
+      priceMax,
+      sortBy = 'Latest Post',
+      categories,
+      distance,
+      color,
       page = 1,
       per_page = 20,
-      s: keyword,
-      category,
-      feature,
-      location,
-      distance,
-      price_min,
-      price_max,
-      color,
-      orderby = 'createdAt',
-      order = 'DESC',
-      start_time,
-      end_time,
+      startTime,
+      endTime,
+      features,
     } = req.query;
-
     const offset = (page - 1) * per_page;
     const limit = Number.parseInt(per_page);
 
@@ -239,12 +248,16 @@ const getListings = async (req, res) => {
       whereConditions.title = { [Op.like]: `%${keyword}%` };
     }
 
-    if (price_min) {
-      whereConditions.priceMin = { [Op.gte]: price_min };
+    if (+priceMin) {
+      whereConditions.priceMin = { [Op.gte]: Number(priceMin) };
     }
 
-    if (price_max) {
-      whereConditions.priceMax = { [Op.lte]: price_max };
+    if (+priceMax) {
+      whereConditions.priceMax = { [Op.lte]: Number(priceMax) };
+    }
+
+    if (+rating) {
+      whereConditions.rate = { [Op.gte]: Number(rating) };
     }
 
     if (color) {
@@ -276,33 +289,44 @@ const getListings = async (req, res) => {
       {
         model: Category,
         as: 'category',
+        ...(categories?.length > 0
+          ? {
+              where: {
+                title: { [Op.in]: categories.split(',') },
+              },
+            }
+          : {}),
       },
     ];
 
-    // Add category filter
-    if (category) {
+    if (features) {
       includeConditions.push({
-        model: Category,
-        as: 'category',
-        where: { id: category },
-      });
-    }
-
-    // Add feature filter
-    if (feature) {
-      includeConditions.push({
-        model: Category,
-        as: 'features',
-        where: { id: feature },
+        model: Facility,
+        as: 'facilities',
+        where: { name: { [Op.in]: features.split(',') } },
       });
     }
 
     // Add location filter
-    if (location) {
+    if (country) {
       includeConditions.push({
         model: Location,
         as: 'country',
-        where: { id: location },
+        where: { name: country },
+      });
+    }
+    if (state) {
+      includeConditions.push({
+        model: Location,
+        as: 'state',
+        where: { name: state },
+      });
+    }
+    if (city) {
+      includeConditions.push({
+        model: Location,
+        as: 'city',
+        where: { name: city },
       });
     }
 
@@ -310,7 +334,7 @@ const getListings = async (req, res) => {
     const { count, rows } = await Product.findAndCountAll({
       where: whereConditions,
       include: includeConditions,
-      order: [[orderby, order]],
+      ...(sortByValues[sortBy] ? { order: sortByValues[sortBy] } : {}),
       offset,
       limit,
       distinct: true,

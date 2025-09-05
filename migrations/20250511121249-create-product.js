@@ -82,11 +82,11 @@ module.exports = {
         allowNull: true,
       },
       priceMin: {
-        type: Sequelize.STRING,
+        type: Sequelize.FLOAT,
         allowNull: true,
       },
       priceMax: {
-        type: Sequelize.STRING,
+        type: Sequelize.FLOAT,
         allowNull: true,
       },
       priceDisplay: {
