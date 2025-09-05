@@ -154,7 +154,7 @@ const getDiscoveryCategories = async (req, res) => {
       has_child: category.hasChild,
       parent_id: category.parentId,
       featuredProducts: category.featuredProducts.map((product) => ({
-        ID: product.id,
+        id: product.id,
         post_title: product.title,
         post_date: product.createdAt,
         rating_avg: product.rate,

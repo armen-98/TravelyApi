@@ -4,13 +4,7 @@ const { Op } = require('sequelize');
 // Get blog home data
 const getBlogHome = async (req, res) => {
   try {
-    const {
-      page = 1,
-      per_page = 10,
-      s: keyword,
-      category_id,
-      sort,
-    } = req.query;
+    const { page = 1, per_page = 10, s: keyword, category_id } = req.query;
 
     const offset = (page - 1) * per_page;
     const limit = Number.parseInt(per_page);
@@ -136,7 +130,7 @@ const getBlogHome = async (req, res) => {
 
     // Format response
     const blogs = rows.map((blog) => ({
-      ID: blog.id,
+      id: blog.id,
       title: blog.title,
       post_date: blog.createdAt,
       status: blog.status,
@@ -172,7 +166,7 @@ const getBlogHome = async (req, res) => {
       data: blogs,
       categories: formattedCategories,
       sticky: {
-        ID: stickyBlog.id,
+        id: stickyBlog.id,
         title: stickyBlog.title,
         post_date: stickyBlog.createdAt,
         status: stickyBlog.status,
@@ -298,7 +292,7 @@ const getBlogDetail = async (req, res) => {
 
     // Format response
     const response = {
-      ID: blog.id,
+      id: blog.id,
       title: blog.title,
       post_date: blog.createdAt,
       status: blog.status,
@@ -338,7 +332,7 @@ const getBlogDetail = async (req, res) => {
         rate: comment.rate,
       })),
       related: relatedBlogs.map((related) => ({
-        ID: related.id,
+        id: related.id,
         post_title: related.title,
         post_date: related.createdAt,
         post_content: related.description?.substring(0, 150) + '...',

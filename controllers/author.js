@@ -59,7 +59,7 @@ const getAuthorListing = async (req, res) => {
     const products = rows.map((product) => ({
       ...product.dataValues,
       useViewPhone: product.phone,
-      ID: product.id,
+      id: product.id,
       post_title: product.title,
       post_date: product.createdAt,
       rating_avg: product.rate,

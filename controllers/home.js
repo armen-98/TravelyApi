@@ -175,7 +175,7 @@ const getHomeInit = async (req, res) => {
     const formattedRecentPosts = recentPosts.map((product) => ({
       ...product.dataValues,
       useViewPhone: product.phone,
-      ID: product.id,
+      id: product.id,
       post_title: product.title,
       post_date: product.createdAt,
       rating_avg: product.rate,
@@ -267,7 +267,7 @@ const getHomeInit = async (req, res) => {
     });
 
     const formattedNews = relatedBlogs.map((blog) => ({
-      ID: blog.id,
+      id: blog.id,
       post_title: blog.title,
       post_date: blog.createdAt,
       post_status: blog.status,
@@ -307,7 +307,7 @@ const getHomeInit = async (req, res) => {
         rate: comment.rate,
       })),
       related: relatedBlogs.map((related) => ({
-        ID: related.id,
+        id: related.id,
         post_title: related.title,
         post_date: related.createdAt,
         post_content: related.description?.substring(0, 150) + '...',
@@ -377,7 +377,7 @@ const getHomeInit = async (req, res) => {
           return {
             ...baseWidget,
             data: widget.products.map((product) => ({
-              ID: product.id,
+              id: product.id,
               post_title: product.title,
               post_date: product.createdAt,
               rating_avg: product.rate,
@@ -425,7 +425,7 @@ const getHomeInit = async (req, res) => {
           return {
             ...baseWidget,
             data: widget.blogs.map((blog) => ({
-              ID: blog.id,
+              id: blog.id,
               post_title: blog.title,
               post_date: blog.createdAt,
               post_content: blog.description,
@@ -590,7 +590,7 @@ const getHomeWidget = async (req, res) => {
         formattedWidget = {
           ...baseWidget,
           data: widget.products.map((product) => ({
-            ID: product.id,
+            id: product.id,
             post_title: product.title,
             post_date: product.createdAt,
             rating_avg: product.rate,
@@ -640,7 +640,7 @@ const getHomeWidget = async (req, res) => {
         formattedWidget = {
           ...baseWidget,
           data: widget.blogs.map((blog) => ({
-            ID: blog.id,
+            id: blog.id,
             post_title: blog.title,
             post_date: blog.createdAt,
             post_content: blog.description,
