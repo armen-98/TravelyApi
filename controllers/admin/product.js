@@ -121,7 +121,7 @@ const getListings = async (req, res) => {
 
     // Format response
     const products = rows.map((product) => ({
-      ID: product.id,
+      id: product.id,
       post_title: product.title,
       post_date: product.createdAt,
       date_establish: product.dateEstablish,

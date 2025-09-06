@@ -11,7 +11,6 @@ const {
   Facility,
   WorkingSchedule,
   TimeSlot,
-  ProductSocialNetwork,
   Wishlist,
 } = require('../models');
 const { Op } = require('sequelize');
@@ -342,7 +341,7 @@ const getListings = async (req, res) => {
 
     // Format response
     const products = rows.map((product) => ({
-      ID: product.id,
+      id: product.id,
       post_title: product.title,
       post_date: product.createdAt,
       date_establish: product.dateEstablish,
@@ -560,7 +559,7 @@ const getProduct = async (req, res) => {
 
     // Format response
     const response = {
-      ID: product.id,
+      id: product.id,
       post_title: product.title,
       post_date: product.createdAt,
       date_establish: product.dateEstablish,
@@ -689,7 +688,7 @@ const getProduct = async (req, res) => {
       related: relatedProducts.map((related) => ({
         ...related.dataValues,
         useViewPhone: related.phone,
-        ID: related.id,
+        id: related.id,
         post_title: related.title,
         post_date: related.createdAt,
         rating_avg: related.rate,
@@ -726,7 +725,7 @@ const getProduct = async (req, res) => {
       lastest: latestProducts.map((latest) => ({
         ...latest.dataValues,
         useViewPhone: latest.phone,
-        ID: latest.id,
+        id: latest.id,
         post_title: latest.title,
         post_date: latest.createdAt,
         rating_avg: latest.rate,

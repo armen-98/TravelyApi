@@ -34,7 +34,7 @@ const getWishlist = async (req, res) => {
       ...item.dataValues,
       ...item.product.dataValues,
       useViewPhone: item.product.phone,
-      ID: item.product.id,
+      id: item.product.id,
       post_title: item.product.title,
       post_date: item.product.createdAt,
       rating_avg: item.product.rate,
