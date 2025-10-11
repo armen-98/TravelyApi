@@ -7,5 +7,6 @@ const { noAuthToken } = require('../middlewares/noAuth');
 
 router.get('/', noAuthToken, settingsController.getSettings);
 router.post('/change-language', verifyToken, settingsController.changeLanguage);
+router.post('/update-token', verifyToken, settingsController.updateDeviceToken);
 
 module.exports = router;
