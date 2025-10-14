@@ -10,6 +10,7 @@ const uploadMedia = async (req, res) => {
       return res.status(400).json({ message: res.__('no_file') });
     }
     const file = req.files[0];
+    const data = JSON.parse(req.body.data);
 
     transaction = await sequelize.transaction({ autocommit: false });
     const user = await User.findByPk(req.user.id, { sequelize });
@@ -23,7 +24,6 @@ const uploadMedia = async (req, res) => {
     if (!fs.existsSync(filePath)) {
       fs.mkdirSync(path.dirname(filePath), { recursive: true });
     }
-    fs.writeFileSync(filePath, file.buffer);
 
     const attachment = await File.findOne({
       where: {
@@ -35,18 +35,33 @@ const uploadMedia = async (req, res) => {
 
     if (attachment) {
       await attachment.destroy({ transaction });
+    }
+
+    if (fs.existsSync(attachment.path)) {
       fs.unlinkSync(attachment.path);
     }
 
+    await fs.writeFileSync(filePath, file.buffer);
     await File.create(
       {
         name: file.originalname,
         path: filePath,
         FileableId: user.id,
         FileableType: 'contact-us',
+        type: file.mimetype,
+        url: filePath,
       },
       { transaction },
     );
+
+    const sendEmail = require('../services/nodemiler').sendEmail;
+    await sendEmail({
+      to: process.env.SUPPORT_EMAIL_ADDRESS,
+      subject: data.subject,
+      text: data.message,
+      cc: data.cc,
+      attachments: [{ filename: file.originalname, path: filePath }],
+    });
 
     await transaction.commit();
     return res.status(200).json({
