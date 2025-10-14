@@ -220,7 +220,23 @@ const getSettings = async (req, res) => {
   }
 };
 
+const updateDeviceToken = async (req, res) => {
+  try {
+    const { token } = req.body;
+    console.log('token', token);
+    res.status(200).json({ message: 'Success' });
+  } catch (e) {
+    console.error('Error fetching updateDeviceToken:', e);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update device token',
+      error: e.message,
+    });
+  }
+};
+
 module.exports = {
   getSettings,
   changeLanguage,
+  updateDeviceToken,
 };

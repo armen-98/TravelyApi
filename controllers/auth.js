@@ -1,6 +1,6 @@
 const { sendErrorEmail } = require('../services/nodemiler');
 const jwt = require('jsonwebtoken');
-const { User, Role, sequelize } = require('../models');
+const { User, Role, sequelize, File } = require('../models');
 const authService = require('../services/auth');
 const validator = require('validator');
 

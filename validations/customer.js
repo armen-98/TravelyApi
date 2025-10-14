@@ -1,7 +1,8 @@
 const Joi = require('@hapi/joi');
 const updateProfile = (data, translate) => {
   const schema = Joi.object({
-    name: Joi.string().max(255).optional(),
+    firstName: Joi.string().max(255).optional(),
+    lastName: Joi.string().max(255).optional(),
     email: Joi.string().email().max(255).optional(),
     url: Joi.string()
       .uri()
