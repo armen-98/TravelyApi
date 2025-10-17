@@ -216,7 +216,6 @@ const sortByValues = {
   'Price: High to Low': [['priceMax', 'DESC']],
 };
 
-// Get product listings
 const getListings = async (req, res) => {
   try {
     const {
@@ -235,12 +234,12 @@ const getListings = async (req, res) => {
       per_page = 20,
       startTime,
       endTime,
+      category_id,
       features,
     } = req.query;
     const offset = (page - 1) * per_page;
     const limit = Number.parseInt(per_page);
 
-    // Build where conditions
     const whereConditions = {};
 
     if (keyword) {
@@ -263,7 +262,6 @@ const getListings = async (req, res) => {
       whereConditions.color = color;
     }
 
-    // Build include conditions
     const includeConditions = [
       {
         model: User,
@@ -291,7 +289,10 @@ const getListings = async (req, res) => {
         ...(categories?.length > 0
           ? {
               where: {
-                title: { [Op.in]: categories.split(',') },
+                id: {
+                  [Op.in]:
+                    typeof categories === 'string' ? [categories] : categories,
+                },
               },
             }
           : {}),

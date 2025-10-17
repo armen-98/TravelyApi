@@ -7,11 +7,20 @@ const {
   Image,
   User,
   Wishlist,
+  Location,
 } = require('../models');
 
-// Get home initialization data
 const getHomeInit = async (req, res) => {
   try {
+    const { country } = req.query;
+
+    const location = await Location.findOne({
+      where: {
+        name: country,
+        type: 'country',
+      },
+    });
+
     const sliders = await Banner.findAll({
       where: { type: 'slider' },
       include: [
@@ -21,10 +30,9 @@ const getHomeInit = async (req, res) => {
         },
       ],
       limit: 5,
-      order: [['id', 'DESC']],
+      order: [['createdAt', 'DESC']],
     });
 
-    // Get categories
     const categories = await Category.findAll({
       where: { type: 'category', parentId: null },
       include: [
@@ -44,10 +52,9 @@ const getHomeInit = async (req, res) => {
         },
       ],
       limit: 10,
-      order: [['count', 'DESC']],
+      order: [['createdAt', 'DESC']],
     });
 
-    // Get locations
     const locations = await Category.findAll({
       where: { type: 'location' },
       include: [
@@ -57,11 +64,14 @@ const getHomeInit = async (req, res) => {
         },
       ],
       limit: 10,
-      order: [['count', 'DESC']],
+      order: [['createdAt', 'DESC']],
     });
 
-    // Get recent posts (products)
     const recentPosts = await Product.findAll({
+      where: {
+        status: 'publish',
+        countryId: location?.id,
+      },
       include: [
         {
           model: Image,
@@ -112,9 +122,9 @@ const getHomeInit = async (req, res) => {
         },
       ],
       limit: 5,
+      order: [['createdAt', 'DESC']],
     });
 
-    // Format response
     const formattedSliders = sliders.map((slider) =>
       slider.image ? slider.image.full : '',
     );
@@ -170,7 +180,6 @@ const getHomeInit = async (req, res) => {
       taxonomy: location.type,
       has_child: false,
     }));
-    console.log('recentPosts', recentPosts);
 
     const formattedRecentPosts = recentPosts.map((product) => ({
       ...product.dataValues,
@@ -209,7 +218,6 @@ const getHomeInit = async (req, res) => {
       booking_price_display: `${(+product.priceDisplay || 0).toFixed(2)}$`,
     }));
 
-    // Get widgets for additional data
     const widgets = await Widget.findAll({
       order: [['position', 'ASC']],
       include: [
@@ -329,7 +337,6 @@ const getHomeInit = async (req, res) => {
       })),
     }));
 
-    // Format widgets
     const formattedWidgets = widgets.map((widget) => {
       const baseWidget = {
         title: widget.title,
@@ -341,7 +348,6 @@ const getHomeInit = async (req, res) => {
         layout: widget.layout,
       };
 
-      // Format data based on widget type
       switch (widget.type) {
         case 'banner':
           return {
@@ -473,7 +479,6 @@ const getHomeInit = async (req, res) => {
   }
 };
 
-// Get home widget data
 const getHomeWidget = async (req, res) => {
   try {
     const { id } = req.params;
