@@ -1,17 +1,14 @@
-const { Category, Image, Product, User } = require('../models');
+const { Category, Image, Product, User, Location } = require('../models');
 
-// Get categories list
 const getCategories = async (req, res) => {
   try {
     const { category_id } = req.query;
 
     const whereConditions = { type: 'category' };
 
-    // If parent_id is provided, filter by parent
     if (category_id) {
       whereConditions.parentId = category_id;
     } else {
-      // If no parent_id, get only top-level categories
       whereConditions.parentId = null;
     }
 
@@ -38,7 +35,6 @@ const getCategories = async (req, res) => {
       ],
     });
 
-    // Format response
     const formattedCategories = categories.map((category) => ({
       term_id: category.id,
       name: category.title,
@@ -90,13 +86,20 @@ const getCategories = async (req, res) => {
   }
 };
 
-// Get discovery categories
 const getDiscoveryCategories = async (req, res) => {
   try {
+    const { country } = req.query;
+    const location = await Location.findOne({
+      where: {
+        name: country,
+        type: 'country',
+      },
+    });
+
     const categories = await Category.findAll({
       where: {
         type: 'category',
-        parentId: null, // Only top-level categories for discovery
+        parentId: null,
       },
       include: [
         {
@@ -108,7 +111,9 @@ const getDiscoveryCategories = async (req, res) => {
           model: Product,
           as: 'featuredProducts',
           required: false,
-          limit: 10,
+          where: {
+            countryId: location?.id,
+          },
           include: [
             {
               model: Image,
