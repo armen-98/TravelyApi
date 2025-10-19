@@ -1,0 +1,11 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home2/travely/api.travely.life/api/travelyApi
+    - /bin/echo "🚀 Starting Travely API deployment"
+    - /bin/cp -R * $DEPLOYPATH
+    - cd $DEPLOYPATH
+    - /bin/npm install --production
+    - /bin/mkdir -p tmp
+    - /bin/touch tmp/restart.txt
+    - /bin/echo "✅ Deployment complete!"
