@@ -2,10 +2,10 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home2/travely/api.travely.life/api
-    - /bin/echo "🚀 Starting Travely API deployment"
-    - /bin/cp -R * $DEPLOYPATH
+    - echo "🚀 Starting Travely API deployment"
+    - /bin/rsync -a --delete ./ $DEPLOYPATH/
     - cd $DEPLOYPATH
-    - /bin/npm install --production
-    - /bin/mkdir -p tmp
-    - /bin/touch tmp/restart.txt
-    - /bin/echo "✅ Deployment complete!"
+    - /bin/npm ci --only=production
+    - mkdir -p tmp
+    - touch tmp/restart.txt
+    - echo "✅ Deployment complete!"
