@@ -26,6 +26,7 @@
 	"otp_not_verified": "OTP not verified",
 	"otp_sent_success": "Your OTP for password reset. This OTP will expire in 10 minutes",
 	"password_subject": "Password Reset",
+	"verify_email": "Verify email",
 	"password_changed_success": "Password changed successfully",
 	"username_or_email_required": "Email or username is required",
 	"token_expired": "Session expired, please sign in again",
