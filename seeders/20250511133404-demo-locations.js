@@ -25,6 +25,13 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+        {
+          name: 'Armenia',
+          type: 'country',
+          parentId: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ],
       { returning: true },
     );
@@ -33,6 +40,7 @@ module.exports = {
     const usId = countries[0].id;
     const ukId = countries[1].id;
     const caId = countries[2].id;
+    const amId = countries[3].id;
 
     // Insert states
     const states = await queryInterface.bulkInsert(
@@ -87,6 +95,13 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+        {
+          name: 'Yerevan',
+          type: 'state',
+          parentId: amId,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ],
       { returning: true },
     );
@@ -99,6 +114,7 @@ module.exports = {
     const scotlandId = states[4].id;
     const ontarioId = states[5].id;
     const quebecId = states[6].id;
+    const yerevanId = states[7].id;
 
     // Insert cities
     return queryInterface.bulkInsert('Locations', [
@@ -197,6 +213,13 @@ module.exports = {
         name: 'Quebec City',
         type: 'city',
         parentId: quebecId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: 'Yerevan',
+        type: 'city',
+        parentId: yerevanId,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
