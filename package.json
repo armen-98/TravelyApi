@@ -13,7 +13,7 @@
     "db:undo:all": "npx sequelize-cli db:migrate:undo:all",
     "db:undo:one": "npx sequelize-cli db:migrate:undo --name 20250428175311-create-setting.js",
     "db:create:seed": "npx sequelize-cli seed:generate --name demo-category-images",
-    "db:seed:file": "npx sequelize-cli db:seed --seed 20250511133327-demo-users.js",
+    "db:seed:file": "npx sequelize-cli db:seed --seed 20250518111438-demo-products.js",
     "db:all:seeds": "npx sequelize-cli db:seed:all",
     "db:run:seed": "npx sequelize-cli db:seed --seed 20250517080228-demo-admin.js",
     "db:undo:seed:all": "npx sequelize-cli db:seed:undo:all",
