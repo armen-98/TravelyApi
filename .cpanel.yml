@@ -1,7 +1,7 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home2/travely/api.travely.life/api/travelyNode
+    - export DEPLOYPATH=/home2/travely/api.travely.life/api
     - /bin/echo "🚀 Starting Travely API deployment"
     - /bin/cp -R * $DEPLOYPATH
     - cd $DEPLOYPATH
