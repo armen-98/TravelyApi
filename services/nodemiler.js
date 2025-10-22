@@ -9,10 +9,15 @@ async function sendEmail({ to, subject, text, html, attachments = [], cc }) {
     console.error('process.env.MAIL_USERNAME', process.env.MAIL_USERNAME);
     console.error('process.env.MAIL_PASSWORD', process.env.MAIL_PASSWORD);
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true, // Use SSL
       auth: {
         user: process.env.MAIL_USERNAME,
         pass: process.env.MAIL_PASSWORD,
+      },
+      tls: {
+        rejectUnauthorized: false, // Fix self-signed cert issues on cPanel
       },
     });
 
