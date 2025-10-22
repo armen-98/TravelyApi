@@ -1,6 +1,6 @@
 const { sendErrorEmail } = require('../services/nodemiler');
 const jwt = require('jsonwebtoken');
-const { User, Role, sequelize, File } = require('../models');
+const { User, Role, sequelize } = require('../models');
 const authService = require('../services/auth');
 const validator = require('validator');
 
@@ -9,6 +9,9 @@ const isValidEmail = (email) => {
 };
 
 function validateUsername(username) {
+  if (!username) {
+    return 'username_length';
+  }
   if (!validator.isLength(username, { min: 3, max: 20 })) {
     return 'username_length';
   }
@@ -66,10 +69,13 @@ const signUp = async (req, res) => {
       });
     }
 
+    const { otp, otpExpiration } = authService.generateOtp();
     const newUser = await User.create(
       {
         email,
         username,
+        verifyCode: otp,
+        otpExpiration,
         password: hashedPassword,
         roleId: role.id,
         location: 'AM',
@@ -97,6 +103,14 @@ const signUp = async (req, res) => {
     const token = authService.generateToken(newUser.id, 'user', '7d');
     delete newUser.password;
     await transaction.commit();
+
+    const sendEmail = require('../services/nodemiler').sendEmail;
+    await sendEmail({
+      to: email,
+      subject: res.__('verify_email'),
+      text: `${otp} - ${res.__('otp_sent_success')}`,
+    });
+
     return res.status(201).json({
       data: {
         token,
@@ -309,7 +323,7 @@ const verifyOtp = async (req, res) => {
       return res.status(404).json({ message: res.__('not_found_user') });
     }
 
-    if (user.otp !== code) {
+    if (user.otp !== code && user.verifyCode !== code) {
       await transaction.rollback();
       return res.status(400).json({ message: res.__('invalid_otp') });
     }
@@ -319,14 +333,29 @@ const verifyOtp = async (req, res) => {
       return res.status(400).json({ message: res.__('invalid_otp') });
     }
 
-    await User.update(
-      { otp: null, otpExpiration: null },
+    const userPayload = {};
+    if (user.verifyCode) {
+      userPayload.verifyCode = null;
+      userPayload.verifiedAt = new Date();
+      userPayload.isActive = true;
+    } else {
+      userPayload.otp = null;
+    }
+
+    const updatedUser = await User.update(
+      { ...userPayload, otpExpiration: null },
       { where: { email }, transaction },
     );
 
     await transaction.commit();
+
+    const token = authService.generateToken(user.id, 'user', '7d');
+
     return res.status(200).json({
-      data: {},
+      data: {
+        token,
+        user: updatedUser,
+      },
       message: res.__('otp_verified'),
     });
   } catch (e) {
