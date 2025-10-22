@@ -1,7 +1,13 @@
 const nodemailer = require('nodemailer');
+require('dotenv').config();
 
 async function sendEmail({ to, subject, text, html, attachments = [], cc }) {
   try {
+    console.log('process.env.MAIL_HOST', process.env.MAIL_HOST);
+    console.log('process.env.MAIL_PORT', process.env.MAIL_PORT);
+    console.log('process.env.MAIL_SERVICE', process.env.MAIL_SERVICE);
+    console.log('process.env.MAIL_USERNAME', process.env.MAIL_USERNAME);
+    console.log('process.env.MAIL_PASSWORD', process.env.MAIL_PASSWORD);
     const transporter = nodemailer.createTransport({
       host: process.env.MAIL_HOST,
       port: process.env.MAIL_PORT,
