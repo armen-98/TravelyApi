@@ -9,7 +9,7 @@ async function sendEmail({ to, subject, text, html, attachments = [], cc }) {
     console.error('process.env.MAIL_USERNAME', process.env.MAIL_USERNAME);
     console.error('process.env.MAIL_PASSWORD', process.env.MAIL_PASSWORD);
     const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
+      host: 'mail.travely.life',
       port: 465,
       secure: true, // Use SSL
       auth: {
