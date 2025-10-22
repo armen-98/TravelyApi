@@ -3,19 +3,13 @@ require('dotenv').config();
 
 async function sendEmail({ to, subject, text, html, attachments = [], cc }) {
   try {
-    console.log('process.env.MAIL_HOST', process.env.MAIL_HOST);
-    console.log('process.env.MAIL_PORT', process.env.MAIL_PORT);
-    console.log('process.env.MAIL_SERVICE', process.env.MAIL_SERVICE);
-    console.log('process.env.MAIL_USERNAME', process.env.MAIL_USERNAME);
-    console.log('process.env.MAIL_PASSWORD', process.env.MAIL_PASSWORD);
+    console.error('process.env.MAIL_HOST', process.env.MAIL_HOST);
+    console.error('process.env.MAIL_PORT', process.env.MAIL_PORT);
+    console.error('process.env.MAIL_SERVICE', process.env.MAIL_SERVICE);
+    console.error('process.env.MAIL_USERNAME', process.env.MAIL_USERNAME);
+    console.error('process.env.MAIL_PASSWORD', process.env.MAIL_PASSWORD);
     const transporter = nodemailer.createTransport({
-      host: process.env.MAIL_HOST,
-      port: process.env.MAIL_PORT,
-      secure: false,
-      service: process.env.MAIL_SERVICE,
-      ignoreTLS: true,
-      socketTimeout: 10000,
-      requireTLS: true,
+      service: 'gmail',
       auth: {
         user: process.env.MAIL_USERNAME,
         pass: process.env.MAIL_PASSWORD,
