@@ -22,7 +22,7 @@ async function sendEmail({ to, subject, text, html, attachments = [], cc }) {
     });
 
     const params = {
-      from: '"TravelGO 👻" <WanderGid>',
+      from: '"TravelGO 👻" <matevosyan@travely.life>',
       to,
       subject,
       text,
