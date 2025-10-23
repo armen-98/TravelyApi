@@ -342,7 +342,7 @@ const verifyOtp = async (req, res) => {
       userPayload.otp = null;
     }
 
-    const updatedUser = await User.update(
+    await User.update(
       { ...userPayload, otpExpiration: null },
       { where: { email }, transaction },
     );
@@ -351,6 +351,8 @@ const verifyOtp = async (req, res) => {
 
     const token = authService.generateToken(user.id, 'user', '7d');
 
+    const updatedUser = await User.findOne({ where: { email } });
+    delete updatedUser.password;
     return res.status(200).json({
       data: {
         token,
