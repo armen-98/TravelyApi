@@ -7,12 +7,15 @@ const {
   deleteProduct,
   getProductForm,
   uploadMedia,
+  getMapData,
 } = require('../controllers/product.js');
 const multerMiddleware = require('../middlewares/multer');
 
 const router = express.Router();
 
 router.get('/list', getListings);
+
+router.post('/map-data', verifyToken, getMapData);
 
 router.get('/form', getProductForm);
 

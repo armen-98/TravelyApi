@@ -8,21 +8,36 @@ async function sendEmail({ to, subject, text, html, attachments = [], cc }) {
     console.error('process.env.MAIL_SERVICE', process.env.MAIL_SERVICE);
     console.error('process.env.MAIL_USERNAME', process.env.MAIL_USERNAME);
     console.error('process.env.MAIL_PASSWORD', process.env.MAIL_PASSWORD);
-    const transporter = nodemailer.createTransport({
-      host: 'mail.travely.life',
-      port: 465,
-      secure: true, // Use SSL
-      auth: {
-        user: process.env.MAIL_USERNAME,
-        pass: process.env.MAIL_PASSWORD,
-      },
-      tls: {
-        rejectUnauthorized: false, // Fix self-signed cert issues on cPanel
-      },
-    });
+    const transporter =
+      process.env.DEV_MODE === 'local'
+        ? nodemailer.createTransport({
+            host: process.env.MAIL_HOST,
+            port: process.env.MAIL_PORT,
+            secure: false,
+            service: process.env.MAIL_SERVICE,
+            ignoreTLS: true,
+            socketTimeout: 10000,
+            requireTLS: true,
+            auth: {
+              user: process.env.MAIL_USERNAME,
+              pass: process.env.MAIL_PASSWORD,
+            },
+          })
+        : nodemailer.createTransport({
+            host: 'mail.travely.life',
+            port: 465,
+            secure: true,
+            auth: {
+              user: process.env.MAIL_USERNAME,
+              pass: process.env.MAIL_PASSWORD,
+            },
+            tls: {
+              rejectUnauthorized: false,
+            },
+          });
 
     const params = {
-      from: '"TravelGO 👻" <matevosyan@travely.life>',
+      from: `"TravelGO 👻" <${process.env.SUPPORT_EMAIL_ADDRESS}>`,
       to,
       subject,
       text,

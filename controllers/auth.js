@@ -8,45 +8,23 @@ const isValidEmail = (email) => {
   return validator.isEmail(email);
 };
 
-function validateUsername(username) {
-  if (!username) {
-    return 'username_length';
-  }
-  if (!validator.isLength(username, { min: 3, max: 20 })) {
-    return 'username_length';
-  }
-  if (!validator.matches(username, /^[a-zA-Z0-9._]+$/)) {
-    return 'username_invalid_format';
-  }
-  return false;
-}
-
 const signUp = async (req, res) => {
   let transaction;
   try {
-    const { email, username, password } = req.body;
-
+    const { name, email, username, password } = req.body;
+    console.log('name', name);
     if (!isValidEmail(email)) {
       return res.status(400).json({ message: res.__('invalid_email') });
     }
-    const usernameError = validateUsername(username);
-    if (usernameError) {
-      return res.status(400).json({ message: res.__(usernameError) });
+    if (!name) {
+      return res.status(400).json({ message: res.__('invalid_name') });
     }
+
     transaction = await sequelize.transaction({ autocommit: false });
     const existingUser = await User.findOne({ where: { email }, transaction });
     if (existingUser) {
       await transaction.rollback();
       return res.status(400).json({ message: res.__('exist_email') });
-    }
-
-    const existingUsername = await User.findOne({
-      where: { username },
-      transaction,
-    });
-    if (existingUsername) {
-      await transaction.rollback();
-      return res.status(400).json({ message: res.__('exist_username') });
     }
 
     const hashedPassword = await authService.hashPassword(password);
@@ -73,14 +51,14 @@ const signUp = async (req, res) => {
     const newUser = await User.create(
       {
         email,
-        username,
+        username: email,
         verifyCode: otp,
         otpExpiration,
         password: hashedPassword,
         roleId: role.id,
         location: 'AM',
         language: 'hy',
-        name: '',
+        name,
         image: '',
         url: '',
         level: 0,

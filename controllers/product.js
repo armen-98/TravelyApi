@@ -1092,6 +1092,53 @@ const uploadMedia = async (req, res) => {
   }
 };
 
+const getMapData = async (req, res) => {
+  try {
+    let { product_ids } = req.body;
+
+    console.log('ids', product_ids);
+    let products = await Product.findAll({
+      where: {
+        id: product_ids,
+      },
+      attributes: ['id', 'latitude', 'longitude'],
+      include: [
+        {
+          model: Category,
+          as: 'category',
+        },
+        {
+          model: Image,
+          as: 'image',
+        },
+      ],
+    });
+    console.log('products', products);
+    products = products.map((product) => ({
+      id: product?.dataValues?.id,
+      post_title: product?.dataValues?.title,
+      coordinate: {
+        latitude: product?.dataValues?.latitude,
+        longitude: product?.dataValues?.longitude,
+      },
+      category: { name: product?.dataValues?.category?.title },
+      address: product?.dataValues?.address,
+      phone: product?.dataValues?.phone,
+      price_min: product?.dataValues?.priceDisplay,
+      rating_avg: product?.dataValues?.rate,
+      image: product?.dataValues?.image,
+    }));
+    return res.status(200).json({ products });
+  } catch (e) {
+    console.error('Error getMapData:', e);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get map data',
+      error: e.message,
+    });
+  }
+};
+
 module.exports = {
   getListings,
   getProduct,
@@ -1099,4 +1146,5 @@ module.exports = {
   deleteProduct,
   getProductForm,
   uploadMedia,
+  getMapData,
 };
