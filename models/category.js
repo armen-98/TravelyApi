@@ -37,6 +37,12 @@ module.exports = (sequelize, Sequelize) => {
   }
   Category.init(
     {
+      isPro: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+        defaultValue: false,
+        comment: 'Indicates whether the category is paid (Pro) or free',
+      },
       title: {
         type: Sequelize.STRING,
         allowNull: false,

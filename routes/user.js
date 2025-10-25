@@ -10,7 +10,7 @@ const multerMiddleware = require('../middlewares/multer');
 
 const router = express.Router();
 
-router.get('/user', verifyToken, getUser);
+router.get('/', verifyToken, getUser);
 
 router.post('/upload/media', [multerMiddleware, verifyToken], uploadMedia);
 router.post('/update/profile', verifyToken, updateUserProfile);

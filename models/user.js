@@ -36,6 +36,12 @@ module.exports = (sequelize, Sequelize) => {
   }
   User.init(
     {
+      isPro: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+        defaultValue: false,
+        comment: 'Indicates whether the user has an active Pro subscription',
+      },
       name: {
         type: Sequelize.STRING,
         allowNull: false,

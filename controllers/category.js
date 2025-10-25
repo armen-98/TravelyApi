@@ -36,6 +36,7 @@ const getCategories = async (req, res) => {
     });
 
     const formattedCategories = categories.map((category) => ({
+      isPro: category.isPro,
       term_id: category.id,
       name: category.title,
       count: category.count,

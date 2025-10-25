@@ -6,6 +6,7 @@ const authController = require('../controllers/auth');
 
 router.post('/sign-up', authController.signUp);
 router.post('/sign-in', authController.signIn);
+router.post('/social-login', authController.socialLogin);
 router.post('/jwt/token/validate', verifyToken, authController.tokenValidate);
 router.get('/user', verifyToken, authController.getAuthUser);
 router.post('/forgot-password', authController.forgotPassword);
