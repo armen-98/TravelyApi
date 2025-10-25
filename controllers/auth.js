@@ -11,7 +11,7 @@ const isValidEmail = (email) => {
 const signUp = async (req, res) => {
   let transaction;
   try {
-    const { name, email, username, password } = req.body;
+    const { name, email, password } = req.body;
     console.log('name', name);
     if (!isValidEmail(email)) {
       return res.status(400).json({ message: res.__('invalid_email') });
@@ -434,6 +434,114 @@ const deactivateAccount = async (req, res) => {
   }
 };
 
+const socialLogin = async (req, res) => {
+  let transaction;
+  try {
+    const { provider, providerId, email, name } = req.body || {};
+    if (!provider || !['google', 'apple'].includes(provider)) {
+      return res.status(400).json({ message: res.__('invalid_provider') });
+    }
+    if (!providerId) {
+      return res.status(400).json({ message: res.__('invalid_provider_id') });
+    }
+
+    transaction = await sequelize.transaction({ autocommit: false });
+
+    let user = null;
+
+    if (email && isValidEmail(email)) {
+      user = await User.findOne({ where: { email }, transaction });
+    }
+
+    if (!user) {
+      const where =
+        provider === 'google'
+          ? { googleId: providerId }
+          : { appleId: providerId };
+      user = await User.findOne({ where, transaction });
+    }
+
+    if (!user) {
+      if (!email || !isValidEmail(email)) {
+        await transaction.rollback();
+        return res.status(400).json({ message: res.__('invalid_email') });
+      }
+      let role = await Role.findOne({
+        where: { name: 'customer' },
+        transaction,
+      });
+      if (!role) {
+        role = await Role.create({ name: 'customer' }, { transaction });
+      }
+
+      const randomPassword = Math.random().toString(36).slice(2) + Date.now();
+      const hashedPassword = await authService.hashPassword(randomPassword);
+
+      const baseData = {
+        email,
+        username: email,
+        password: hashedPassword,
+        roleId: role.id,
+        name: name || (email ? email.split('@')[0] : 'User'),
+        image: '',
+        url: '',
+        level: 0,
+        description: '',
+        tag: '',
+        rate: 0,
+        comment: 0,
+        total: 0,
+        verifiedAt: new Date(),
+        isActive: true,
+      };
+
+      if (provider === 'google') baseData.googleId = providerId;
+      if (provider === 'apple') baseData.appleId = providerId;
+
+      user = await User.create(baseData, { transaction });
+    } else {
+      if (provider === 'google' && !user.googleId) {
+        await User.update(
+          { googleId: providerId },
+          { where: { id: user.id }, transaction },
+        );
+      }
+      if (provider === 'apple' && !user.appleId) {
+        await User.update(
+          { appleId: providerId },
+          { where: { id: user.id }, transaction },
+        );
+      }
+      await user.reload({ transaction });
+    }
+
+    await transaction.commit();
+
+    const token = authService.generateToken(user.id, 'user', '7d');
+    const safeUser = await User.findOne({ where: { id: user.id } });
+    if (safeUser && safeUser.password) delete safeUser.password;
+
+    return res.status(200).json({
+      data: {
+        token,
+        user: safeUser,
+      },
+      message: res.__('login_success'),
+    });
+  } catch (e) {
+    console.log('Catch error for socialLogin', e);
+    if (process.env.NODE_ENV !== 'development') {
+      sendErrorEmail(e);
+    }
+    if (transaction) {
+      await transaction.rollback();
+    }
+    return res.status(500).json({
+      message: res.__('internal_error'),
+    });
+  }
+};
+
 module.exports = {
   signUp,
   signIn,
@@ -443,4 +551,5 @@ module.exports = {
   verifyOtp,
   changePassword,
   deactivateAccount,
+  socialLogin,
 };
