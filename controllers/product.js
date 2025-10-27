@@ -1096,12 +1096,10 @@ const getMapData = async (req, res) => {
   try {
     let { product_ids } = req.body;
 
-    console.log('ids', product_ids);
     let products = await Product.findAll({
       where: {
         id: product_ids,
       },
-      attributes: ['id', 'latitude', 'longitude'],
       include: [
         {
           model: Category,
@@ -1111,9 +1109,13 @@ const getMapData = async (req, res) => {
           model: Image,
           as: 'image',
         },
+        {
+          model: Wishlist,
+          as: 'wishlist',
+        },
       ],
     });
-    console.log('products', products);
+
     products = products.map((product) => ({
       id: product?.dataValues?.id,
       post_title: product?.dataValues?.title,
@@ -1127,6 +1129,7 @@ const getMapData = async (req, res) => {
       price_min: product?.dataValues?.priceDisplay,
       rating_avg: product?.dataValues?.rate,
       image: product?.dataValues?.image,
+      isWishlist: !!product?.dataValues?.wishlist?.productId,
     }));
     return res.status(200).json({ products });
   } catch (e) {
