@@ -1,63 +1,39 @@
 const { Location } = require('../models');
 
-// Get locations
+// Get locations: supports flat fetching by type and parent_id
+// type: 'country' | 'state' | 'city'
+// - country: list all countries
+// - state: requires parent_id (country id) → list states for that country
+// - city: requires parent_id (state id) → list cities for that state
 const getLocations = async (req, res) => {
   try {
     const { parent_id, type = 'country' } = req.query;
-    const where = {
-      type:
-        type === 'location'
-          ? 'state'
-          : type === 'category'
-            ? 'city'
-            : 'category',
-    };
 
-    if (parent_id) {
-      where.parentId = parent_id;
+    // Validate type
+    const allowed = ['country', 'state', 'city'];
+    const resolvedType = allowed.includes(type) ? type : 'country';
+
+    // For state and city, parent_id is required
+    if ((resolvedType === 'state' || resolvedType === 'city') && !parent_id) {
+      return res.status(400).json({
+        success: false,
+        message: `parent_id is required when type is '${resolvedType}'`,
+      });
     }
 
-    const countries = await Location.findAll({
-      where,
-      include: [
-        {
-          model: Location,
-          as: 'children',
-          where: { type: 'state' },
-          required: false,
-          include: [
-            {
-              model: Location,
-              as: 'children',
-              where: { type: 'city' },
-              required: false,
-            },
-          ],
-        },
-      ],
-    });
+    const where = { type: resolvedType };
+    if (parent_id) where.parentId = parent_id;
 
-    // Format response
-    const formattedLocations = countries.map((country) => ({
-      term_id: country.id,
-      name: country.name,
-      type: country.type,
-      children: country.children?.map((state) => ({
-        term_id: state.id,
-        name: state.name,
-        type: state.type,
-        children: state.children?.map((city) => ({
-          term_id: city.id,
-          name: city.name,
-          type: city.type,
-        })),
-      })),
+    const rows = await Location.findAll({ where });
+
+    const data = rows.map((loc) => ({
+      term_id: loc.id,
+      name: loc.name,
+      type: loc.type,
+      parent_id: loc.parentId ?? null,
     }));
 
-    res.status(200).json({
-      success: true,
-      data: formattedLocations,
-    });
+    res.status(200).json({ success: true, data });
   } catch (error) {
     console.error('Error fetching locations:', error);
     res.status(500).json({
